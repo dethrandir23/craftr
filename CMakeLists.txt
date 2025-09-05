@@ -19,6 +19,6 @@ file(GLOB_RECURSE SOURCES
 add_executable(craftr ${SOURCES})
 
 # Optionally, set output directory for the binary
-set_target_properties(craft PROPERTIES
+set_target_properties(craftr PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
 )

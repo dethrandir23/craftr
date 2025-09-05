@@ -1,0 +1,83 @@
+/**
+ * @file        main.cpp
+ * @author      Your Name (your-email@example.com)
+ * @brief       The main entry point for the craftr CLI tool.
+ * @version     0.1.0
+ * @date        2025-09-04
+ *
+ * @copyright   Copyright (c) 2025
+ *
+ * @details
+ * This file contains the main function that launches the craftr application.
+ * It uses the Cliopatra library to parse command-line arguments and will
+ * delegate tasks to the appropriate handlers based on user input, such as
+ * initializing a new project, adding components, or building the source.
+ */
+
+#include <iostream>
+#include "../include/Cliopatra.hpp"
+#include "../include/output_utils.hpp"
+#include "../include/project_utils.hpp"
+
+bool execResults (Cliopatra::ParsedMap& results) {
+    try {
+
+        if (results.find("help") != results.end()) {
+            OutputUtils::print_help();
+        }
+
+        if (results.find("version") != results.end()) {
+            OutputUtils::print_version();
+        }
+
+        if (results.find("init") != results.end()) {
+            // TODO : Add optional licence, readme etc flags.
+            auto name = std::get<std::string>(results["init"]);
+            if (!name.empty()) {
+                ProjectUtils::init_project(name);
+            } else {
+                std::cout << "Please enter a project name" << std::endl; 
+            }
+        }
+
+        if (results.find("add") != results.end()) {
+            // TODO : Convert add module system to multi_string_option, just like <path> <module> or reverse.
+            auto name = std::get<std::string>(results["add"]);
+            if (!name.empty()) {
+                ProjectUtils::init_project(name);
+            } else {
+                std::cout << "Please enter a project name" << std::endl; 
+            }
+        }
+
+        if (results.find("") != results.end()) {
+
+        }
+
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+int main(int argc, char **argv) {
+
+    std::cout << "Hello World!" << std::endl;
+
+    Cliopatra cliopatra;
+    cliopatra.addOption("h", "help", Cliopatra::Option::bool_o);
+    cliopatra.addOption("v", "version", Cliopatra::Option::bool_o);
+    cliopatra.addOption("i", "init", Cliopatra::Option::string_o);
+    cliopatra.addOption("a", "add", Cliopatra::Option::string_o);
+    cliopatra.addOption("b", "build", Cliopatra::Option::string_o);
+
+    try {
+        auto results = cliopatra.parse(argc, argv);
+        execResults(results);
+    } catch (...) {
+        std::cerr << "Parsing command line arguments or executing them." << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
