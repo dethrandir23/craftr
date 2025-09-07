@@ -21,3 +21,4 @@ add_executable(PROJECT_NAME ${SOURCES})
 # Optionally, set output directory for the binary
 set_target_properties(PROJECT_NAME PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+)
