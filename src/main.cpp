@@ -1,17 +1,22 @@
 /**
  * @file        main.cpp
- * @author      Your Name (your-email@example.com)
- * @brief       The main entry point for the craftr CLI tool.
- * @version     0.1.0
+ * @author      dethrandir23 (efeoztrk23@proton.me)
+ * @brief       Entry point for the craftr CLI tool.
+ * @version     1.0.0
  * @date        2025-09-04
  *
  * @copyright   Copyright (c) 2025
  *
  * @details
- * This file contains the main function that launches the craftr application.
- * It uses the Cliopatra library to parse command-line arguments and will
- * delegate tasks to the appropriate handlers based on user input, such as
- * initializing a new project, adding components, or building the source.
+ * This file launches the craftr command-line interface, which helps developers
+ * create and manage C++ projects using predefined templates. It uses the Cliopatra
+ * library to parse command-line arguments and delegates tasks such as:
+ *   - Creating a new project (`--create`)
+ *   - Adding modules or components (`--add`)
+ *   - Building the project (`--build`)
+ *   - Specifying project metadata (author and license)
+ *
+ * It also provides utility commands like `--help` and `--version`.
  */
 
 #include <iostream>
