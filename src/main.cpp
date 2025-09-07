@@ -19,6 +19,24 @@
 #include "../include/output_utils.hpp"
 #include "../include/project_utils.hpp"
 
+LicenseType stringToLicense(const std::string& license_name) {
+    std::string name = license_name;
+
+    std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+    if (name == "mit") {
+        return LicenseType::MIT;
+    } else if (name == "bsd") {
+        return LicenseType::BSD;
+    } else if (name == "gpl") {
+        return LicenseType::GPL;
+    } else if (name == "apache") {
+        return LicenseType::Apache;
+    }
+
+    return LicenseType::Custom;
+}
+
 bool execResults (Cliopatra::ParsedMap& results) {
     try {
 
@@ -30,25 +48,28 @@ bool execResults (Cliopatra::ParsedMap& results) {
             OutputUtils::print_version();
         }
 
-        if (results.find("init") != results.end()) {
+        if (results.find("create") != results.end()) {
             // TODO : Add optional licence, readme etc flags.
-            auto name = std::get<std::string>(results["init"]);
+            auto name = std::get<std::string>(results["create"]);
+            auto author = std::get<std::string>(results["author"]);
+            auto license = std::get<std::string>(results["license"]);
             if (!name.empty()) {
-                ProjectUtils::init_project(name);
+                ProjectUtils::create_project(name, author, stringToLicense(std::get<std::string>(results["license"])));
             } else {
                 std::cout << "Please enter a project name" << std::endl; 
             }
         }
 
+        /*
         if (results.find("add") != results.end()) {
             // TODO : Convert add module system to multi_string_option, just like <path> <module> or reverse.
             auto name = std::get<std::string>(results["add"]);
             if (!name.empty()) {
-                ProjectUtils::init_project(name);
+                ProjectUtils::create_project(name, const std::string &author, const LicenseType &license)
             } else {
                 std::cout << "Please enter a project name" << std::endl; 
             }
-        }
+        } */
 
         if (results.find("") != results.end()) {
 
@@ -62,14 +83,14 @@ bool execResults (Cliopatra::ParsedMap& results) {
 
 int main(int argc, char **argv) {
 
-    std::cout << "Hello World!" << std::endl;
-
     Cliopatra cliopatra;
     cliopatra.addOption("h", "help", Cliopatra::Option::bool_o);
     cliopatra.addOption("v", "version", Cliopatra::Option::bool_o);
-    cliopatra.addOption("i", "init", Cliopatra::Option::string_o);
+    cliopatra.addOption("c", "create", Cliopatra::Option::string_o);
     cliopatra.addOption("a", "add", Cliopatra::Option::string_o);
     cliopatra.addOption("b", "build", Cliopatra::Option::string_o);
+    cliopatra.addOption("au", "author", Cliopatra::Option::string_o);
+    cliopatra.addOption("l", "license", Cliopatra::Option::string_o);
 
     try {
         auto results = cliopatra.parse(argc, argv);
