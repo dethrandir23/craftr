@@ -2,23 +2,49 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include "licensetype.hpp"
 
 namespace StringUtils
 {
-    extern std::string project_name_replacer;
-    extern std::string author_name_replacer;
-    extern std::string date_replacer;
 
-    std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+    enum class Placeholder {
+        ProjectName,
+        AuthorName,
+        Date
+    };
 
-    std::string GetCMakeLists(const std::string& project_name);
+    inline std::string ToString(Placeholder ph) {
+        switch (ph) {
+            case Placeholder::ProjectName: return "PROJECT_NAME";
+            case Placeholder::AuthorName:  return "AUTHOR_NAME";
+            case Placeholder::Date:        return "DATE";
+        }
+        return "";
+    }
 
-    std::string GetReadme(const std::string& project_name);
+    enum class ContentType {
+        CMake,
+        Readme,
+        Metadata,
+        Main,
+        License
+    };
 
-    std::string GetMetadata(const std::string& project_name, const std::string& author_name);
+    inline std::string ToString(ContentType ct) {
+        switch (ct) {
+            case ContentType::CMake:    return "cmake";
+            case ContentType::Readme:   return "readme";
+            case ContentType::Metadata: return "metadata";
+            case ContentType::Main:     return "main";
+            case ContentType::License:  return "license";
+        }
+        return "";
+    }
 
-    std::string GetMainCpp(const std::string& project_name, const std::string& author_name);
+    using Contents = std::unordered_map<ContentType, std::string>;
+    using ReplacePairs = std::unordered_map<Placeholder, std::string>;
 
-    std::string GetLicense(const LicenseType& license, const std::string& author_name);
+    ReplacePairs GetReplacePairs(const std::string& project_name, const std::string& author_name);
+    Contents GetContents(const LicenseType& license);
 } // namespace StringUtils
