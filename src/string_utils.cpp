@@ -4,10 +4,7 @@
 #include "../include/paths.hpp"
 #include "../include/file_utils.hpp"
 #include <string>
-#include <ctime>
 #include <iostream>
-#include <fstream>
-#include <sstream>
 
 namespace StringUtils
 {
