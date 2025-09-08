@@ -2,7 +2,7 @@
     #include <string>
     #include "../include/template_engine.hpp"
 
-    std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    std::string TemplateEngine::ReplaceAll(std::string str, const std::string& from, const std::string& to) {
         size_t pos = 0;
         while ((pos = str.find(from, pos)) != std::string::npos)
         {

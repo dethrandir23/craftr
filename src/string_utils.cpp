@@ -42,9 +42,11 @@ namespace StringUtils
                 }
                 case LicenseType::GPL: {
                     contents[ContentType::License] = FileUtils::LoadFileToString(Paths::GPL);
+                    break;
                 }
                 case LicenseType::Apache: {
                     contents[ContentType::License] = FileUtils::LoadFileToString(Paths::Apache);
+                    break;
                 }
                 case LicenseType::Custom: {
                     break; // TODO:
