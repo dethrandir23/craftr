@@ -1,74 +1,17 @@
-//project_utils.cpp
+// project_utils.cpp
 
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include "../include/Cliopatra.hpp"
-#include "../include/output_utils.hpp"
-#include "../include/project_utils.hpp"
-#include "../include/file_utils.hpp"
+#include <unordered_map>
+#include <utility>
+
+#include "../include/template_engine.hpp" 
 #include "../include/string_utils.hpp"
+#include "../include/file_utils.hpp"
 #include "../include/licensetype.hpp"
+#include "../include/project_utils.hpp" 
 
-namespace {
-    bool create_cmake(const std::string& path, const std::string& name) {
-        try {
-            FileUtils::create_file(path, "CMakeLists.txt", StringUtils::GetCMakeLists(name));
-        } catch (...) {
-            return false;
-        }
-        return true;
-    }
-
-    bool create_readme(const std::string& path, const std::string& name) {
-        try {
-            FileUtils::create_file(path, "README.md", StringUtils::GetReadme(name));
-        } catch (...) {
-            return false;
-        }
-        return true;
-    }
-
-    bool create_metadata(const std::string& path, const std::string& name, const std::string& author) {
-        try {
-            FileUtils::create_file(path, "metadata.json", StringUtils::GetMetadata(name, author));
-        } catch (...) {
-            return false;
-        }
-        return true;
-    }
-
-    bool create_main_cpp(const std::string& path, const std::string& name, const std::string& author) {
-        try {
-            FileUtils::create_file(path, "main.cpp", StringUtils::GetMainCpp(name, author));
-        } catch (...) {
-            return false;
-        }
-        return true;
-    }
-
-    bool create_license(const std::string& path, const LicenseType& license, const std::string& author) {
-        try  {
-            FileUtils::create_file(path, "LICENSE", StringUtils::GetLicense(license, author));
-        } catch (...) {
-            return false;
-        }
-        return true;
-    }
-}
-
-            // example project template to create:
-            /*
-            .
-            ├── CMakeLists.txt
-            ├── include
-            ├── LICENSE
-            ├── metadata
-            │   └── metadata.json
-            ├── README.md
-            └── src
-                └── main.cpp
-            */
 namespace ProjectUtils
 {
     bool create_project(const std::string& name, const std::string& author, const LicenseType& license) {
@@ -80,25 +23,37 @@ namespace ProjectUtils
             std::filesystem::create_directory(project_dir / "src");
             std::filesystem::create_directories(project_dir / "metadata");
 
-            create_cmake(project_dir, name);
-            create_readme(project_dir, name);
-            create_metadata(project_dir / "metadata", name, author);
-            create_main_cpp(project_dir / "src", name, author);
-            create_license(project_dir, license, author);
+            StringUtils::ReplacePairs replacePairs = StringUtils::GetReplacePairs(name, author);
+            StringUtils::Contents contents = StringUtils::GetContents(license);
 
-        } catch (const std::filesystem::filesystem_error& e) {
-            std::cerr << "Filesystem error: " << e.what() << '\n';
-            return false;
-        } catch (...) {
-            std::cerr << "Unknown error during project initialization\n";
+            TemplateEngine::fillAllContents(contents, replacePairs);
+
+            const std::unordered_map<StringUtils::ContentType, std::filesystem::path> file_paths = {
+                { StringUtils::ContentType::CMake,    project_dir / "CMakeLists.txt" },
+                { StringUtils::ContentType::Readme,   project_dir / "README.md" },
+                { StringUtils::ContentType::License,  project_dir / "LICENSE" },
+                { StringUtils::ContentType::Metadata, project_dir / "metadata" / "metadata.json" },
+                { StringUtils::ContentType::Main,     project_dir / "src" / "main.cpp" }
+            };
+
+            if (license == LicenseType::Custom && contents.find(StringUtils::ContentType::License) == contents.end()) {
+                std::cout << "Custom license selected, no LICENSE file will be created." << std::endl;
+            }
+
+            for (const auto& [contentType, contentString] : contents) {
+                auto it = file_paths.find(contentType);
+                if (it != file_paths.end()) {
+                    const auto& file_path = it->second;
+                    FileUtils::create_file(file_path.parent_path().string(), file_path.filename().string(), contentString);
+                }
+            }
+
+        } catch (const std::exception& e) {
+            std::cerr << "Error creating project: " << e.what() << '\n';
             return false;
         }
 
+        std::cout << "Project '" << name << "' created successfully!" << std::endl;
         return true;
     }
-
-    /*bool add_module(const std::string& name) {
-        // TODO : not now
-        return false;
-    }*/
 }
