@@ -1,13 +1,13 @@
 /**
  * @file main.cpp
- * @brief Entry point for the PROJECT_NAME application.
+ * @brief Entry point for the {{PROJECT_NAME}} application.
  *
  * This is a basic C++ program that prints "Hello, World!" to the console.
  * It serves as a starting template for future development.
  *
- * @author AUTHOR_NAME
- * @date DATE
- * @copyright Copyright (c) DATE
+ * @author {{AUTHOR_NAME}}
+ * @date {{DATE}}
+ * @copyright Copyright (c) {{DATE}}
  */
 
 #include <iostream>
