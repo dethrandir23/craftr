@@ -16,9 +16,9 @@ namespace StringUtils
 
     inline std::string ToString(Placeholder ph) {
         switch (ph) {
-            case Placeholder::ProjectName: return "PROJECT_NAME";
-            case Placeholder::AuthorName:  return "AUTHOR_NAME";
-            case Placeholder::Date:        return "DATE";
+            case Placeholder::ProjectName: return "{{PROJECT_NAME}}";
+            case Placeholder::AuthorName:  return "{{AUTHOR_NAME}}";
+            case Placeholder::Date:        return "{{DATE}}";
         }
         return "";
     }
