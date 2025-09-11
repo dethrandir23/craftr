@@ -39,4 +39,12 @@ namespace FileUtils
         buffer << file.rdbuf();
         return buffer.str();
     }
+
+    std::filesystem::path get_project_root() {
+        return PROJECT_ROOT_DIR;
+    }
+
+    std::filesystem::path get_templates_folder() {
+        return get_project_root().append("templates");
+    }
 } // namespace FileUtils
