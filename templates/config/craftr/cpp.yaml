@@ -1,0 +1,24 @@
+name: "default_cpp"
+version: "1.0.0"
+author: "system"
+description: "Default C++ project template"
+
+replacers:
+  PROJECT_NAME: "{{PROJECT_NAME}}"
+  AUTHOR_NAME: "{{AUTHOR_NAME}}"
+  DATE: "{{DATE}}"
+
+subfolders:
+  - include
+  - src
+  - metadata
+
+files:
+  - target: "CMakeLists.txt"
+    template: "cmake/CMake_Template.txt"
+  - target: "src/main.cpp"
+    template: "cpp/main.txt"
+  - target: "README.md"
+    template: "readme/README.txt"
+  - target: "LICENSE"
+    template: "license"
