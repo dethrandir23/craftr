@@ -26,6 +26,11 @@ set_target_properties(craftr PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
 )
 
+add_compile_definitions(PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")
+
+find_package(yaml-cpp REQUIRED)
+target_link_libraries(craftr PRIVATE yaml-cpp)
+
 # Optional: Enable warnings and extra flags
 if(MSVC)
     target_compile_options(craftr PRIVATE /W4 /permissive-)

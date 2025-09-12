@@ -20,9 +20,11 @@
  */
 
 #include <iostream>
+#include <ostream>
 #include "../include/Cliopatra.hpp"
 #include "../include/output_utils.hpp"
 #include "../include/project_utils.hpp"
+#include "../include/project_template.hpp"
 
 LicenseType stringToLicense(const std::string& license_name) {
     std::string name = license_name;
@@ -86,8 +88,7 @@ bool execResults (Cliopatra::ParsedMap& results) {
     }
 }
 
-int main(int argc, char **argv) {
-
+int main(int argc, char **argv) { 
     Cliopatra cliopatra;
     cliopatra.addOption("h", "help", Cliopatra::Option::bool_o);
     cliopatra.addOption("v", "version", Cliopatra::Option::bool_o);
@@ -103,7 +104,50 @@ int main(int argc, char **argv) {
     } catch (...) {
         std::cerr << "Parsing command line arguments or executing them." << std::endl;
         return 1;
+    } 
+
+    ProjectTemplate tmpl("../templates/config/craftr/cpp.yaml");
+    tmpl.LoadTemplate();
+
+
+
+
+    /*
+    std::cout << tmpl.GetAuthor() << std::endl;
+    std::cout << tmpl.GetDescription() << std::endl;
+
+    for (auto it : tmpl.GetFileBluePrints()) {
+        std::cout << "template path: " << it.template_path.string();
+        std::cout << "   ***   ";
+        std::cout << "target path: " << it.target_path.string();
+        std::cout << "\n";
     }
+
+    std::cout << std::endl;
+
+    for (auto it : tmpl.GetLicenses()) {
+        std::cout << "template path: " << it.first;
+        std::cout << "\n";
+        std::cout << "target path: " << it.second;
+    }
+
+    std::cout << std::endl;
+
+    for (auto it : tmpl.GetSubFolders()) {
+        std::cout << it;
+        std::cout << "\n";
+    }
+
+    std::cout << "\n";
+
+    for (auto it : tmpl.GetReplacers()) {
+        std::cout << it.GetType();
+        std::cout << "   ***   ";
+        std::cout << it.GetText();
+        std::cout << "\n";
+    }
+
+    */
 
     return 0;
 }

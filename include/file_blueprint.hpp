@@ -1,10 +1,7 @@
 //file_blueprint.hpp
 #pragma once
 
-#include <string>
 #include <filesystem>
-#include "content.hpp"
-#include "template_engine.hpp"
 
 struct FileBlueprint {
     std::filesystem::path template_path;
