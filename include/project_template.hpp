@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <replacer.hpp>
 
 class ProjectTemplate {
 public:
@@ -20,7 +21,7 @@ public:
     const std::string& GetVersion() const { return this->version; }
     const std::string& GetAuthor() const { return this->author; }
     const std::string& GetDescription() const { return this->description; }
-    const std::vector<std::pair<std::string, std::string>>& GetReplacers() const { return this->replacers; }
+    const std::vector<Replacer>& GetReplacers() const { return this->replacers; }
     const std::vector<std::filesystem::path> GetSubFolders() const { return this->subfolders; }
     const std::vector<FileBlueprint>& GetFileBluePrints() const { return this->file_blueprints; }
     const std::map<std::string, std::string>& GetLicenses() const { return this->licenses; }
@@ -32,14 +33,18 @@ public:
     void SetDescription(const std::string& new_description) { description = new_description; }
 
     void AddReplacer(const std::string& key, const std::string& value) {
-        replacers.emplace_back(key, value);
+        replacers.emplace_back(Replacer(key, value));
+    }
+
+    void AddReplacer(const Replacer& r) {
+        replacers.emplace_back(r);
     }
 
     void ClearReplacers() {
         replacers.clear();
     }
 
-    void SetReplacers(const std::vector<std::pair<std::string, std::string>>& new_replacers) {
+    void SetReplacers(const std::vector<Replacer>& new_replacers) {
         replacers = new_replacers;
     }
 
@@ -89,7 +94,7 @@ private:
     std::string author = "";
     std::string description = "";
 
-    std::vector<std::pair<std::string, std::string>> replacers;
+    std::vector<Replacer> replacers;
 
     std::vector<std::filesystem::path> subfolders;
     std::vector<FileBlueprint> file_blueprints;
