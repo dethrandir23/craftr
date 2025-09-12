@@ -1,8 +1,10 @@
 //file_utils.hpp
 #pragma once
 
+#include "content_file.hpp"
 #include <filesystem>
 #include <string>
+#include <vector>
 
 namespace FileUtils
 {
@@ -11,4 +13,7 @@ namespace FileUtils
     std::string LoadFileToString(const std::string& filepath);
     std::filesystem::path get_project_root();
     std::filesystem::path get_templates_folder();
+    bool write_content_files(const std::vector<ContentFile>& files);
+    bool create_subfolders(const std::vector<std::filesystem::path>& subfolders, const std::filesystem::path& basePath);
+
 } //namespace FileUtils
