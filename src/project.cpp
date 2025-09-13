@@ -1,9 +1,10 @@
 //project.hpp
 #include "../include/project.hpp"
+#include "../include/license_utils.hpp"
 #include <iostream>
 #include "../include/file_utils.hpp"
-#include "content_file.hpp"
-#include "template_engine.hpp"
+#include "../include/content_file.hpp"
+#include "../include/template_engine.hpp"
 
 void Project::pairReplacers() {
     for (auto& replacer : replacers) {
@@ -23,11 +24,24 @@ void Project::pairReplacers() {
 
 void Project::createContentFiles() {
     for (auto& fbp : this->tmpl.GetFileBluePrints()) {
+        if (fbp.target_path == "LICENSE") {
+            LicenseType lt = LicenseUtils::GetLicenseType(getLicenseType());
+            std::cout << "License type enum: " << static_cast<int>(lt) << std::endl;
+            
+            std::string licenseText = LicenseUtils::GetLicenseText(lt);
+            std::cout << "License text length: " << licenseText.length() << std::endl;
+            
+            std::string filledLicense = TemplateEngine::fillContent(licenseText, this->replacers);
+            contentFiles.emplace_back(ContentFile(Content(filledLicense), fbp.target_path));
+            continue;
+        }
+        std::filesystem::path fullTemplatePath = FileUtils::get_templates_folder() / fbp.template_path;
+
         contentFiles.emplace_back(
             ContentFile(
                 Content(
                     TemplateEngine::fillContent(
-                        FileUtils::LoadFileToString(fbp.template_path),
+                        FileUtils::LoadFileToString(fullTemplatePath.string()),
                         this->replacers
                     )
                 ),
