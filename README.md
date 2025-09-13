@@ -108,6 +108,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Craftr** is maintained with ❤️ by [dethrandir23](https://github.com/dethrandir23)
+**Craftr** is made with ❤️ by [dethrandir23](https://github.com/dethrandir23)
 
 ```
