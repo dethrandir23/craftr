@@ -2,6 +2,7 @@
 #pragma once
 
 #include "content_file.hpp"
+#include "project.hpp"
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -15,5 +16,8 @@ namespace FileUtils
     std::filesystem::path get_templates_folder();
     bool write_content_files(const std::vector<ContentFile>& files);
     bool create_subfolders(const std::vector<std::filesystem::path>& subfolders, const std::filesystem::path& basePath);
+
+    bool write_project(const Project& project);
+
 
 } //namespace FileUtils

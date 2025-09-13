@@ -1,9 +1,11 @@
 //file_utils.cpp
 #include "../include/file_utils.hpp"
+#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <string>
 #include <fstream>
+#include "../include/project.hpp"
 
 namespace FileUtils
 {
@@ -17,7 +19,7 @@ namespace FileUtils
             if (!file.is_open()) {
                 std::cerr << "Error: Could not open file for writing: " << fullPath << std::endl;
                 return false;
-            }   
+            }
             file << content;
             file.close();
         } catch (const std::exception& e) {
@@ -53,17 +55,14 @@ namespace FileUtils
         return get_project_root().append("templates");
     }
 
-    bool write_content_files(const std::vector<ContentFile>& files) {
+    bool write_content_files(const std::vector<ContentFile>& files, const std::filesystem::path& basePath) {
         try {
             for (const auto& file_to_create : files) {
-                const std::filesystem::path& target = file_to_create.target_path;
-
-                const std::string& content_text = file_to_create.content.get_text();
-
+                std::filesystem::path target = basePath / file_to_create.target_path;
                 std::filesystem::path directory = target.parent_path();
                 std::string filename = target.filename().string();
-                
-                if (!create_file(directory, filename, content_text)) {
+
+                if (!create_file(directory, filename, file_to_create.content.get_text())) {
                     std::cerr << "Failed to create one or more files. Aborting." << std::endl;
                     return false; 
                 }
@@ -72,7 +71,6 @@ namespace FileUtils
             std::cerr << "An error occurred while writing files: " << e.what() << std::endl;
             return false;
         }
-
         return true;
     }
 
@@ -86,6 +84,18 @@ namespace FileUtils
             }
         } catch (const std::exception& e) {
             std::cerr << "Error creating subfolders: " << e.what() << std::endl;
+            return false;
+        }
+        return true;
+    }
+
+    bool write_project(const Project& project) {
+        try {
+            if (!create_subfolders(project.getSubFolders(), project.getProjectSubFolder())) { return false; }
+            if (!write_content_files(project.getContentFiles(), project.getProjectSubFolder())) { return false; }
+
+        } catch (const std::exception& e) {
+            std::cerr << "An error occurred while writing files: " << e.what() << std::endl;
             return false;
         }
         return true;
