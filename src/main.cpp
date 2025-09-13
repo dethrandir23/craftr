@@ -24,25 +24,6 @@
 #include "../include/Cliopatra.hpp"
 #include "../include/output_utils.hpp"
 #include "../include/project_utils.hpp"
-#include "../include/project_template.hpp"
-
-LicenseType stringToLicense(const std::string& license_name) {
-    std::string name = license_name;
-
-    std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-
-    if (name == "mit") {
-        return LicenseType::MIT;
-    } else if (name == "bsd") {
-        return LicenseType::BSD;
-    } else if (name == "gpl") {
-        return LicenseType::GPL;
-    } else if (name == "apache") {
-        return LicenseType::Apache;
-    }
-
-    return LicenseType::Custom;
-}
 
 bool execResults (Cliopatra::ParsedMap& results) {
     try {
@@ -61,22 +42,11 @@ bool execResults (Cliopatra::ParsedMap& results) {
             auto author = std::get<std::string>(results["author"]);
             auto license = std::get<std::string>(results["license"]);
             if (!name.empty()) {
-                ProjectUtils::create_project(name, author, stringToLicense(std::get<std::string>(results["license"])));
+                ProjectUtils::create_project(name, author, (std::get<std::string>(results["license"])));
             } else {
                 std::cout << "Please enter a project name" << std::endl; 
             }
         }
-
-        /*
-        if (results.find("add") != results.end()) {
-            // TODO : Convert add module system to multi_string_option, just like <path> <module> or reverse.
-            auto name = std::get<std::string>(results["add"]);
-            if (!name.empty()) {
-                ProjectUtils::create_project(name, const std::string &author, const LicenseType &license)
-            } else {
-                std::cout << "Please enter a project name" << std::endl; 
-            }
-        } */
 
         if (results.find("") != results.end()) {
 
@@ -104,50 +74,7 @@ int main(int argc, char **argv) {
     } catch (...) {
         std::cerr << "Parsing command line arguments or executing them." << std::endl;
         return 1;
-    } 
-
-    ProjectTemplate tmpl("../templates/config/craftr/cpp.yaml");
-    tmpl.LoadTemplate();
-
-
-
-
-    /*
-    std::cout << tmpl.GetAuthor() << std::endl;
-    std::cout << tmpl.GetDescription() << std::endl;
-
-    for (auto it : tmpl.GetFileBluePrints()) {
-        std::cout << "template path: " << it.template_path.string();
-        std::cout << "   ***   ";
-        std::cout << "target path: " << it.target_path.string();
-        std::cout << "\n";
     }
-
-    std::cout << std::endl;
-
-    for (auto it : tmpl.GetLicenses()) {
-        std::cout << "template path: " << it.first;
-        std::cout << "\n";
-        std::cout << "target path: " << it.second;
-    }
-
-    std::cout << std::endl;
-
-    for (auto it : tmpl.GetSubFolders()) {
-        std::cout << it;
-        std::cout << "\n";
-    }
-
-    std::cout << "\n";
-
-    for (auto it : tmpl.GetReplacers()) {
-        std::cout << it.GetType();
-        std::cout << "   ***   ";
-        std::cout << it.GetText();
-        std::cout << "\n";
-    }
-
-    */
 
     return 0;
 }
