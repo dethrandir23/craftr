@@ -6,12 +6,12 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <replacer.hpp>
+#include "replacer.hpp"
 
 class ProjectTemplate {
 public:
-    ProjectTemplate(const std::filesystem::path& template_path) {
-        this->template_path = template_path;
+    ProjectTemplate(const std::filesystem::path& path) {
+        this->template_path = path;
     }
 
     bool LoadTemplate();
