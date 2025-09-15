@@ -3,7 +3,7 @@ version: "1.0.0"
 author: "system"
 description: "Default C++ project template"
 
-replacers:
+variables:
   PROJECT_NAME: "{{PROJECT_NAME}}"
   AUTHOR_NAME: "{{AUTHOR_NAME}}"
   DATE: "{{DATE}}"

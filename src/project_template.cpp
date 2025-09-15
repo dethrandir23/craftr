@@ -18,8 +18,8 @@ bool ProjectTemplate::LoadTemplate() {
     if (config["description"])
       description = config["description"].as<std::string>();
 
-    if (config["replacers"]) {
-      for (auto it : config["replacers"]) {
+    if (config["variables"]) {
+      for (auto it : config["variables"]) {
         replacers.emplace_back(it.first.as<std::string>(),
                                it.second.as<std::string>());
       }
