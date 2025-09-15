@@ -1,6 +1,7 @@
 // file_utils.cpp
 #include "../include/file_utils.hpp"
 #include "../include/project.hpp"
+#include "../include/string_utils.hpp"
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -109,6 +110,40 @@ bool write_project(const Project &project) {
     return false;
   }
   return true;
+}
+
+std::vector<std::string>
+getFileNames(const std::filesystem::path &directoryPath) {
+  std::vector<std::string> fileNames;
+  for (const auto &entry : std::filesystem::directory_iterator(directoryPath)) {
+    if (entry.is_regular_file()) {
+      fileNames.push_back(StringUtils::toLower(entry.path().stem().string()));
+    }
+  }
+  return fileNames;
+}
+
+std::vector<std::filesystem::path>
+getFilePaths(const std::filesystem::path &directoryPath) {
+  std::vector<std::filesystem::path> paths;
+  for (const auto &entry : std::filesystem::directory_iterator(directoryPath)) {
+    if (entry.is_regular_file()) {
+      paths.push_back(entry.path());
+    }
+  }
+  return paths;
+}
+
+std::map<std::string, std::filesystem::path>
+getFileMap(const std::filesystem::path &directoryPath) {
+  std::map<std::string, std::filesystem::path> fileMap;
+  for (const auto &entry : std::filesystem::directory_iterator(directoryPath)) {
+    if (entry.is_regular_file()) {
+      fileMap[StringUtils::toLower(entry.path().stem().string())] =
+          entry.path();
+    }
+  }
+  return fileMap;
 }
 
 } // namespace FileUtils

@@ -20,4 +20,11 @@ bool create_subfolders(const std::vector<std::filesystem::path> &subfolders,
 
 bool write_project(const Project &project);
 
+std::vector<std::string>
+getFileNames(const std::filesystem::path &directoryPath);
+std::vector<std::filesystem::path>
+getFilePaths(const std::filesystem::path &directoryPath);
+std::map<std::string, std::filesystem::path>
+getFileMap(const std::filesystem::path &directoryPath);
+
 } // namespace FileUtils
