@@ -1,9 +1,7 @@
-//date_utils.hpp
+// date_utils.hpp
 #pragma once
 #include <string>
 
-
-namespace DateUtils
-{
-    std::string GetCurrentYearStr();
+namespace DateUtils {
+std::string GetCurrentYearStr();
 }

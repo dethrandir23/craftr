@@ -1,11 +1,10 @@
 // output_utils.hpp
 #pragma once
 
-namespace OutputUtils
-{
+namespace OutputUtils {
 
 void print_help();
 
 void print_version();
 
-}
+} // namespace OutputUtils

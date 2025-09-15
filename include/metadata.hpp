@@ -1,36 +1,24 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
 #include <fstream>
-#include <string>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
+#include <string>
 
-namespace Metadata
-{
-    inline nlohmann::json load()
-    {
-        std::ifstream file("../metadata/metadata.json");
-        if (!file.is_open())
-        {
-            throw std::runtime_error("Could not open metadata.json");
-        }
-        nlohmann::json metadata;
-        file >> metadata;
-        return metadata;
-    }
-
-    inline std::string name()
-    {
-        return load().value("name", "UnknownProject");
-    }
-
-    inline std::string version()
-    {
-        return load().value("version", "0.0.0");
-    }
-
-    inline std::string author()
-    {
-        return load().value("author", "UnknownAuthor");
-    }
+namespace Metadata {
+inline nlohmann::json load() {
+  std::ifstream file("../metadata/metadata.json");
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open metadata.json");
+  }
+  nlohmann::json metadata;
+  file >> metadata;
+  return metadata;
 }
+
+inline std::string name() { return load().value("name", "UnknownProject"); }
+
+inline std::string version() { return load().value("version", "0.0.0"); }
+
+inline std::string author() { return load().value("author", "UnknownAuthor"); }
+} // namespace Metadata
