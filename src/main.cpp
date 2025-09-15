@@ -41,10 +41,16 @@ bool execResults(Cliopatra::ParsedMap &results) {
       // TODO : Add optional licence, readme etc flags.
       auto name = std::get<std::string>(results["create"]);
       auto author = std::get<std::string>(results["author"]);
-      auto license = std::get<std::string>(results["license"]);
+
+      std::string license = "none";
+      
+      if (results.find("license") != results.end()) {
+        license = std::get<std::string>(results["license"]);
+      }
+
       if (!name.empty()) {
         ProjectUtils::create_project(
-            name, author, (std::get<std::string>(results["license"])));
+            name, author, license);
       } else {
         std::cout << "Please enter a project name" << std::endl;
       }
