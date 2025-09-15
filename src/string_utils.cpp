@@ -3,6 +3,7 @@
 #include "../include/date_utils.hpp"
 #include "../include/file_utils.hpp"
 #include "../include/paths.hpp"
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -56,6 +57,12 @@ Contents GetContents(const LicenseType &license) {
   }
 
   return contents;
+}
+
+std::string toLower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    return s;
 }
 
 } // namespace StringUtils

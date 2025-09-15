@@ -45,4 +45,6 @@ using ReplacePairs = std::unordered_map<Placeholder, std::string>;
 ReplacePairs GetReplacePairs(const std::string &project_name,
                              const std::string &author_name);
 Contents GetContents(const LicenseType &license);
+
+std::string toLower(std::string s);
 } // namespace StringUtils
