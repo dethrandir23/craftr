@@ -1,10 +1,12 @@
 // license_utils.hpp
 #pragma once
 #include "licensetype.hpp"
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace LicenseUtils {
-LicenseType GetLicenseType(const std::string &name);
 
-std::string GetLicenseText(const LicenseType &licenseType);
+std::optional<std::string> GetLicenseText(const std::string &name);
+std::vector<std::string> GetLicenseTypes();
 } // namespace LicenseUtils

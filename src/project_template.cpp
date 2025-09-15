@@ -38,7 +38,7 @@ bool ProjectTemplate::LoadTemplate() {
         if (it["template"].IsScalar()) {
           std::string tmpl = it["template"].as<std::string>();
           file_blueprints.emplace_back(FileBlueprint(tmpl, target));
-        } else if (it["template"].IsMap()) {
+        } else if (it["template"].IsMap()) { // TODO : Refactor later
           for (auto lic : it["template"]) {
             std::string license_key = lic.first.as<std::string>();
             std::string tmpl_path = lic.second.as<std::string>();

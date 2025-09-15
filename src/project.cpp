@@ -25,14 +25,20 @@ void Project::pairReplacers() {
 void Project::createContentFiles() {
   for (auto &fbp : this->tmpl.GetFileBluePrints()) {
     if (fbp.target_path == "LICENSE") {
-      LicenseType lt = LicenseUtils::GetLicenseType(getLicenseType());
-      std::cout << "License type enum: " << static_cast<int>(lt) << std::endl;
+      if (getLicenseType() == "none") { continue; };
 
-      std::string licenseText = LicenseUtils::GetLicenseText(lt);
-      std::cout << "License text length: " << licenseText.length() << std::endl;
+      auto licenseText = LicenseUtils::GetLicenseText(this->getLicenseType());
+      if (!licenseText) {
+        std::cerr << "Provided license does not exists in licenses folder. Available licenses:" << std::endl;
+        for (auto l : LicenseUtils::GetLicenseTypes()) {
+            std::cout << l << std::endl;
+        }
+        std::cout << "If you want to add a custom license, paste your license template in TODO: add directory here";
+        continue;
+      }
 
       std::string filledLicense =
-          TemplateEngine::fillContent(licenseText, this->replacers);
+          TemplateEngine::fillContent(licenseText.value(), this->replacers);
       contentFiles.emplace_back(
           ContentFile(Content(filledLicense), fbp.target_path));
       continue;
