@@ -1,8 +1,6 @@
 // license_utils.cpp
 #include "../include/file_utils.hpp"
-#include "../include/licensetype.hpp"
 #include <algorithm>
-#include <iostream>
 #include <optional>
 #include <string>
 

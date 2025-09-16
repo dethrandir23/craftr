@@ -1,6 +1,5 @@
 // license_utils.hpp
 #pragma once
-#include "licensetype.hpp"
 #include <optional>
 #include <string>
 #include <vector>
