@@ -4,6 +4,7 @@
 #include "content_file.hpp"
 #include "date_utils.hpp"
 #include "project_template.hpp"
+#include "replacer.hpp"
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -24,9 +25,8 @@ private:
   ProjectTemplate tmpl;
 
 public:
-  Project(const std::string &n, const std::string &v, const std::string &a,
-          const ProjectTemplate &t)
-      : name(n), version(v), author(a), tmpl(t) {
+  Project(const ProjectTemplate &t)
+      : tmpl(t) {
     date = DateUtils::GetCurrentYearStr();
     replacers = t.GetReplacers();
     subFolders = t.GetSubFolders();
@@ -50,6 +50,8 @@ public:
     return projectSubFolder;
   }
 
+  std::vector<Replacer>& getReplacers() { return this->replacers; }
+
   void setName(const std::string &n) { name = n; }
   void setVersion(const std::string &v) { version = v; }
   void setAuthor(const std::string &a) { author = a; }
@@ -68,7 +70,5 @@ public:
     projectSubFolder = p;
   }
 
-  void createLicenseFile();
-  void pairReplacers();
   void createContentFiles();
 };

@@ -6,22 +6,6 @@
 #include "../include/template_engine.hpp"
 #include <iostream>
 
-void Project::pairReplacers() {
-  for (auto &replacer : replacers) {
-    const std::string &type = replacer.GetType();
-
-    if (type == "PROJECT_NAME") {
-      replacer.SetValue(this->name);
-    } else if (type == "AUTHOR_NAME") {
-      replacer.SetValue(this->author);
-    } else if (type == "DATE") {
-      replacer.SetValue(this->date);
-    } else {
-      std::cerr << "Unknown replacer type: " << replacer.GetType() << "\n";
-    }
-  }
-}
-
 void Project::createContentFiles() {
   for (auto &fbp : this->tmpl.GetFileBluePrints()) {
     if (fbp.target_path == "LICENSE") {

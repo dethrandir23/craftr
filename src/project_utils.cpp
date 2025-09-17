@@ -1,5 +1,6 @@
 // project_utils.cpp
 
+#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -7,35 +8,34 @@
 #include "../include/file_utils.hpp"
 #include "../include/project.hpp"
 #include "../include/project_template.hpp"
+#include "../include/replacer_utils.hpp"
+#include "../include/config.hpp"
 
 namespace ProjectUtils {
 
-bool create_project(const std::string &name, const std::string &author,
-                    const std::string &license) {
+bool create_project(const Config& config) {
   try {
-
-    std::filesystem::path templatePath =
-        FileUtils::get_templates_folder() / "config/craftr/cpp.yaml";
-    ProjectTemplate tmpl(templatePath);
+    ProjectTemplate tmpl(config.templatePath);
     if (!tmpl.LoadTemplate()) {
       std::cerr << "Failed to load template\n";
       return false;
     }
-    Project project(name, "1.0.0", author, tmpl);
-    project.setProjectSubFolder(
-        FileUtils::get_project_subfolder(project.getName()));
-    project.setLicenseType(license);
-    project.pairReplacers();
+    Project project(tmpl); //! Project uses old system, fix it later
+    project.setName(config.name);
+    project.setProjectSubFolder(FileUtils::get_project_subfolder(config.name));
+    project.setLicenseType(config.license);
+    ReplacerUtils::FillReplacersFromConfig(project.getReplacers(), config);
     project.createContentFiles();
     if (!FileUtils::write_project(project)) {
+      std::cerr << "Something went wrong while writing project." << std::endl;
       return false;
     }
 
   } catch (const std::exception &e) {
-    std::cerr << "Error creating project: " << e.what() << '\n';
+    std::cerr << "Error creating project: " << e.what() << std::endl;
     return false;
   }
-  std::cout << "Project '" << name << "' created successfully!" << std::endl;
+  std::cout << "Project '" << config.name << "' created successfully!" << std::endl;
   return true;
 }
 } // namespace ProjectUtils
