@@ -1,4 +1,4 @@
-name: "default_cpp"
+name: "cpp"
 version: "1.0.0"
 author: "system"
 description: "Default C++ project template"
