@@ -27,4 +27,7 @@ getFilePaths(const std::filesystem::path &directoryPath);
 std::map<std::string, std::filesystem::path>
 getFileMap(const std::filesystem::path &directoryPath);
 
+std::filesystem::path getConfigDir(const std::string& app_name);
+std::filesystem::path getDataDir(const std::string &app_name);
+
 } // namespace FileUtils

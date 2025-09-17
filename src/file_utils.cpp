@@ -141,9 +141,103 @@ getFileMap(const std::filesystem::path &directoryPath) {
     if (entry.is_regular_file()) {
       fileMap[StringUtils::toLower(entry.path().stem().string())] =
           entry.path();
-    }
+    } 
   }
   return fileMap;
+}
+
+std::filesystem::path getConfigDir(const std::string &app_name) {
+  std::filesystem::path config_path;
+
+#if defined(_WIN32)
+  const char *appdata = std::getenv("APPDATA");
+  if (appdata != nullptr) {
+    config_path = std::filesystem::path(appdata) / app_name;
+  } else {
+    const char *userprofile = std::getenv("USERPROFILE");
+    if (userprofile != nullptr) {
+      config_path = std::filesystem::path(userprofile) / app_name;
+    } else {
+      config_path = std::filesystem::current_path() / app_name;
+    }
+  }
+#elif defined(__APPLE__)
+  const char *home = std::getenv("HOME");
+  if (home != nullptr) {
+    config_path = std::filesystem::path(home) / "Library" /
+                  "Application Support" / app_name;
+  } else {
+    config_path = std::filesystem::current_path() / app_name;
+  }
+#elif defined(__linux__)
+  const char *xdg_config_home = std::getenv("XDG_CONFIG_HOME");
+  if (xdg_config_home != nullptr && std::string(xdg_config_home).length() > 0) {
+    config_path = std::filesystem::path(xdg_config_home) / app_name;
+  } else {
+    const char *home = std::getenv("HOME");
+    if (home != nullptr) {
+      config_path = std::filesystem::path(home) / ".config" / app_name;
+    } else {
+      config_path = std::filesystem::current_path() / app_name;
+    }
+  }
+#else
+#error "Unsupported operating system!"
+#endif
+
+  try {
+    if (!std::filesystem::exists(config_path)) {
+      std::filesystem::create_directories(config_path);
+    }
+  } catch (const std::filesystem::filesystem_error &e) {
+    std::cerr << "Failed to create configuration directory: " << e.what()
+              << std::endl;
+    return std::filesystem::path();
+  }
+
+  return config_path;
+}
+
+std::filesystem::path getDataDir(const std::string &app_name) {
+  std::filesystem::path data_path;
+
+#if defined(_WIN32)
+  const char *local_appdata = std::getenv("LOCALAPPDATA");
+  if (local_appdata != nullptr) {
+    data_path = std::filesystem::path(local_appdata) / app_name;
+  }
+#elif defined(__APPLE__)
+  const char *home = std::getenv("HOME");
+  if (home != nullptr) {
+    data_path = std::filesystem::path(home) / "Library" /
+                "Application Support" / app_name;
+  }
+#elif defined(__linux__)
+  const char *xdg_data_home = std::getenv("XDG_DATA_HOME");
+  if (xdg_data_home != nullptr && std::string(xdg_data_home).length() > 0) {
+    data_path = std::filesystem::path(xdg_data_home) / app_name;
+  } else {
+    const char *home = std::getenv("HOME");
+    if (home != nullptr) {
+      data_path = std::filesystem::path(home) / ".local" / "share" / app_name;
+    }
+  }
+#else
+#error "Unsupported Operating System!"
+#endif
+
+  if (data_path.empty()) {
+    data_path = std::filesystem::current_path() / app_name / "data";
+  }
+
+  try {
+    std::filesystem::create_directories(data_path);
+  } catch (const std::filesystem::filesystem_error &e) {
+    std::cerr << "Failed to create data directory: " << e.what() << std::endl;
+    return std::filesystem::path();
+  }
+
+  return data_path;
 }
 
 } // namespace FileUtils
