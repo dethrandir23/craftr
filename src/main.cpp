@@ -21,68 +21,68 @@
  */
 
 #include "../include/Cliopatra.hpp"
+#include "../include/config.hpp"
+#include "../include/config_utils.hpp"
+#include "../include/file_utils.hpp"
+#include "../include/license_utils.hpp"
 #include "../include/output_utils.hpp"
 #include "../include/project_utils.hpp"
+#include "../include/string_utils.hpp"
+#include "../include/template_utils.hpp"
 #include <iostream>
 #include <ostream>
-
-bool execResults(Cliopatra::ParsedMap &results) {
-  try {
-
-    if (results.find("help") != results.end()) {
-      OutputUtils::print_help();
-    }
-
-    if (results.find("version") != results.end()) {
-      OutputUtils::print_version();
-    }
-
-    if (results.find("create") != results.end()) {
-      // TODO : Add optional licence, readme etc flags.
-      auto name = std::get<std::string>(results["create"]);
-      auto author = std::get<std::string>(results["author"]);
-
-      std::string license = "none";
-      
-      if (results.find("license") != results.end()) {
-        license = std::get<std::string>(results["license"]);
-      }
-
-      if (!name.empty()) {
-        ProjectUtils::create_project(
-            name, author, license);
-      } else {
-        std::cout << "Please enter a project name" << std::endl;
-      }
-    }
-
-    if (results.find("") != results.end()) {
-    }
-
-    return true;
-  } catch (...) {
-    return false;
-  }
-}
+#include <string>
 
 int main(int argc, char **argv) {
   Cliopatra cliopatra;
   cliopatra.addOption("h", "help", Cliopatra::Option::bool_o);
   cliopatra.addOption("v", "version", Cliopatra::Option::bool_o);
-  cliopatra.addOption("c", "create", Cliopatra::Option::string_o);
+  cliopatra.addOption("c", "create", Cliopatra::Option::bool_o);
   cliopatra.addOption("a", "add", Cliopatra::Option::string_o);
   cliopatra.addOption("b", "build", Cliopatra::Option::string_o);
-  cliopatra.addOption("au", "author", Cliopatra::Option::string_o);
-  cliopatra.addOption("l", "license", Cliopatra::Option::string_o);
+  cliopatra.addOption("co", "config", Cliopatra::Option::string_o);
+  cliopatra.addOption("t", "template", Cliopatra::Option::string_o);
 
-  try {
-    auto results = cliopatra.parse(argc, argv);
-    execResults(results);
-  } catch (...) {
-    std::cerr << "Parsing command line arguments or executing them."
-              << std::endl;
-    return 1;
-  }
+    try {
+      auto results = cliopatra.parse(argc, argv);
+      Config config;
+      auto templates_dir = "../templates/config/craftr";
+      if (results.find("create") != results.end()) {
+        if (results.find("template") == results.end()) {
+          std::cerr << "You must enter a template name to create the project" << std::endl;
+        }
+        config.templatePath = TemplateUtils::FindTemplateByName(templates_dir, std::get<std::string>(results["template"])).value();
+        for (auto valuetoask : TemplateUtils::GetTemplateReplacerTypes(templates_dir,
+                std::get<std::string>(results["template"]))) {
+          if (valuetoask == "DATE") {
+            config.variables[valuetoask] = DateUtils::GetCurrentYearStr();
+            continue;
+          }
+          std::string input;
+          std::cout << "Enter the " << valuetoask << " : ";
+          std::getline(std::cin, input);
+          config.variables[valuetoask] = input;
+          if (valuetoask == "PROJECT_NAME") {
+            config.name = StringUtils::trim(input);
+          }
+        }
+        std::string input;
+        std::cout << "Select your license type: " << std::endl;
+        for (auto l : LicenseUtils::GetLicenseTypes()) {
+          std::cout << "- " << l << std::endl;
+        }
+        std::cout << "Selected license (if you don't want one, press enter): "
+                  << std::endl;
+        std::getline(std::cin, input);
+        config.license = StringUtils::trim(input) == "" ? config.license = "none"
+                                                        : config.license = input;
+      }
+      ProjectUtils::create_project(config);
+    } catch (...) {
+      std::cerr << "Parsing command line arguments or executing them."
+                << std::endl;
+      return 1;
+    }
 
   return 0;
 }
