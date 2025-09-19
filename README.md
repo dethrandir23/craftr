@@ -15,6 +15,7 @@ While it was born as a C++ project creator, its **YAML-based template engine** n
   - **Fully Customizable:** Make `craftr` your personal project launcher by adding your own templates to the `~/.config/craftr` directory.
   - **Dynamic Content:** Placeholders like `{{PLACEHOLDER}}` in your template files are automatically populated with your inputs.
   - **Cross-Platform:** Designed to work seamlessly on Linux, macOS, and Windows.
+  - **Post-Creation Hooks**: Automatically run shell commands (like git init or npm install) after your project is created.
 
 ## 📦 Installation
 
@@ -77,7 +78,7 @@ Mordor/
 
 ## 🎨 How The Template System Works
 
-The heart of Craftr is its template system, defined by YAML. A template defines the project structure, folders, files, and the variables to be requested from the user. Here is the `template.yaml` for the built-in `cpp` template:
+The heart of Craftr is its template system, defined by YAML. A template defines the project structure, folders, files, commands, and the variables to be requested from the user. Here is the `template.yaml` for the built-in `cpp` template:
 
 ```yaml
 name: "cpp"
@@ -109,6 +110,14 @@ files:
     template: "license" # 'license' is a special keyword for license generation
   - target: "metadata/metadata.json"
     template: "metadata/metadata.txt"
+
+command_mode: cautious # cautious mode stops executing commands if one of them fails, but execute_all mode executes all of them at any cost
+
+# Commands to be executed after project creation
+commands:
+  - "cd {{PROJECT_NAME}} && git init"
+  - "cd {{PROJECT_NAME}} && git add ."
+  - "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
 ```
 
 Craftr parses this file and replaces placeholders like `{{PROJECT_NAME}}` in the template source files (e.g., `CMake_Template.txt`) with the values provided by the user.
