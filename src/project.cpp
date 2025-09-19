@@ -5,6 +5,15 @@
 #include "../include/license_utils.hpp"
 #include "../include/template_engine.hpp"
 #include <iostream>
+#include <vector>
+
+void Project::createCommands() {
+  std::vector<std::string> new_commands;
+ for (auto &command : this->commands) {
+  new_commands.emplace_back(TemplateEngine::fillContent(command, this->replacers));
+ }
+ setCommands(new_commands);
+}
 
 void Project::createContentFiles() {
   for (auto &fbp : this->tmpl.GetFileBluePrints()) {

@@ -1,6 +1,7 @@
 // project.hpp
 #pragma once
 
+#include "command_utils.hpp"
 #include "content_file.hpp"
 #include "date_utils.hpp"
 #include "project_template.hpp"
@@ -21,15 +22,18 @@ private:
   std::vector<ContentFile> contentFiles;
   std::vector<std::filesystem::path> subFolders;
 
+  CommandUtils::CommandMode commandMode;
+  std::vector<std::string> commands;
+
   std::filesystem::path projectSubFolder;
   ProjectTemplate tmpl;
 
 public:
-  Project(const ProjectTemplate &t)
-      : tmpl(t) {
+  Project(const ProjectTemplate &t) : tmpl(t) {
     date = DateUtils::GetCurrentYearStr();
     replacers = t.GetReplacers();
     subFolders = t.GetSubFolders();
+    commands = t.getCommands();
   }
 
   const std::string &getName() const { return name; }
@@ -50,7 +54,8 @@ public:
     return projectSubFolder;
   }
 
-  std::vector<Replacer>& getReplacers() { return this->replacers; }
+  std::vector<Replacer> &getReplacers() { return this->replacers; }
+  std::vector<std::string> &getCommands() { return this->commands; }
 
   void setName(const std::string &n) { name = n; }
   void setVersion(const std::string &v) { version = v; }
@@ -70,5 +75,13 @@ public:
     projectSubFolder = p;
   }
 
+  CommandUtils::CommandMode getCommandMode() const { return this->commandMode; }
+  void setCommandMode(const CommandUtils::CommandMode &cm) {
+    this->commandMode = cm;
+  }
+
+  void setCommands(const std::vector<std::string> &c) { this->commands = c; }
+
+  void createCommands();
   void createContentFiles();
 };

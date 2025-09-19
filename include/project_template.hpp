@@ -1,6 +1,7 @@
 // project_template.hpp
 #pragma once
 
+#include "command_utils.hpp"
 #include "file_blueprint.hpp"
 #include "replacer.hpp"
 #include <filesystem>
@@ -89,6 +90,15 @@ public:
     licenses = new_licenses;
   }
 
+  std::vector<std::string> getCommands() const { return this->commands; }
+
+  void setCommands(const std::vector<std::string> &c) { this->commands = c; }
+
+  CommandUtils::CommandMode getCommandMode() const { return this->commandMode; }
+  void setCommandMode(const CommandUtils::CommandMode &cm) {
+    this->commandMode = cm;
+  }
+
 private:
   std::string name = "";
   std::string version = "";
@@ -99,6 +109,9 @@ private:
 
   std::vector<std::filesystem::path> subfolders;
   std::vector<FileBlueprint> file_blueprints;
+  std::vector<std::string> commands;
+  CommandUtils::CommandMode commandMode;
+
   std::map<std::string, std::string> licenses;
 
   std::filesystem::path template_path;

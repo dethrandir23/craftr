@@ -38,7 +38,8 @@ bool ProjectTemplate::LoadTemplate() {
         if (it["template"].IsScalar()) {
           std::string tmpl = it["template"].as<std::string>();
           file_blueprints.emplace_back(FileBlueprint(tmpl, target));
-        } else if (it["template"].IsMap()) { // TODO : Refactor later
+        } else if (it["template"].IsMap()) { // TODO : Refactor later, we not
+                                             // use license map system anymore.
           for (auto lic : it["template"]) {
             std::string license_key = lic.first.as<std::string>();
             std::string tmpl_path = lic.second.as<std::string>();
@@ -46,6 +47,26 @@ bool ProjectTemplate::LoadTemplate() {
             licenses[license_key] = tmpl_path;
           }
         }
+      }
+    }
+
+    if (config["command_mode"]) {
+      if (config["command_mode"].as<std::string>() == "cautious") {
+        commandMode = CommandUtils::CommandMode::Cautious;
+      } else if (config["command_mode"].as<std::string>() == "execute_all") {
+        commandMode = CommandUtils::CommandMode::ExecuteAll;
+      } else {
+        std::cerr << "Unknown command mode in your template file. please set "
+                     "it to \"cautious\" or \"execute_all\" "
+                  << std::endl;
+        std::cerr << "Craftr sets command mode to cautious now." << std::endl;
+        commandMode = CommandUtils::CommandMode::Cautious;
+      }
+    }
+
+    if (config["commands"]) {
+      for (auto it : config["commands"]) {
+        commands.emplace_back(it.as<std::string>());
       }
     }
 
