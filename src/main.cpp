@@ -43,46 +43,50 @@ int main(int argc, char **argv) {
   cliopatra.addOption("co", "config", Cliopatra::Option::string_o);
   cliopatra.addOption("t", "template", Cliopatra::Option::string_o);
 
-    try {
-      auto results = cliopatra.parse(argc, argv);
-      Config config;
-      auto templates_dir = "../templates/config/craftr";
-      if (results.find("create") != results.end()) {
-        if (results.find("template") == results.end()) {
-          std::cerr << "You must enter a template name to create the project" << std::endl;
-        }
-        config.templatePath = TemplateUtils::FindTemplateByName(templates_dir, std::get<std::string>(results["template"])).value();
-        for (auto valuetoask : TemplateUtils::GetTemplateReplacerTypes(templates_dir,
-                std::get<std::string>(results["template"]))) {
-          if (valuetoask == "DATE") {
-            config.variables[valuetoask] = DateUtils::GetCurrentYearStr();
-            continue;
-          }
-          std::string input;
-          std::cout << "Enter the " << valuetoask << " : ";
-          std::getline(std::cin, input);
-          config.variables[valuetoask] = input;
-          if (valuetoask == "PROJECT_NAME") {
-            config.name = StringUtils::trim(input);
-          }
+  try {
+    auto results = cliopatra.parse(argc, argv);
+    Config config;
+    auto templates_dir = "../templates/config/craftr";
+    if (results.find("create") != results.end()) {
+      if (results.find("template") == results.end()) {
+        std::cerr << "You must enter a template name to create the project"
+                  << std::endl;
+      }
+      config.templatePath =
+          TemplateUtils::FindTemplateByName(
+              templates_dir, std::get<std::string>(results["template"]))
+              .value();
+      for (auto valuetoask : TemplateUtils::GetTemplateReplacerTypes(
+               templates_dir, std::get<std::string>(results["template"]))) {
+        if (valuetoask == "DATE") {
+          config.variables[valuetoask] = DateUtils::GetCurrentYearStr();
+          continue;
         }
         std::string input;
-        std::cout << "Select your license type: " << std::endl;
-        for (auto l : LicenseUtils::GetLicenseTypes()) {
-          std::cout << "- " << l << std::endl;
-        }
-        std::cout << "Selected license (if you don't want one, press enter): "
-                  << std::endl;
+        std::cout << "Enter the " << valuetoask << " : ";
         std::getline(std::cin, input);
-        config.license = StringUtils::trim(input) == "" ? config.license = "none"
-                                                        : config.license = input;
+        config.variables[valuetoask] = input;
+        if (valuetoask == "PROJECT_NAME") {
+          config.name = StringUtils::trim(input);
+        }
       }
-      ProjectUtils::create_project(config);
-    } catch (...) {
-      std::cerr << "Parsing command line arguments or executing them."
+      std::string input;
+      std::cout << "Select your license type: " << std::endl;
+      for (auto l : LicenseUtils::GetLicenseTypes()) {
+        std::cout << "- " << l << std::endl;
+      }
+      std::cout << "Selected license (if you don't want one, press enter): "
                 << std::endl;
-      return 1;
+      std::getline(std::cin, input);
+      config.license = StringUtils::trim(input) == "" ? config.license = "none"
+                                                      : config.license = input;
     }
+    ProjectUtils::create_project(config);
+  } catch (...) {
+    std::cerr << "Parsing command line arguments or executing them."
+              << std::endl;
+    return 1;
+  }
 
   return 0;
 }
