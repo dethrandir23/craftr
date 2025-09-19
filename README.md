@@ -1,11 +1,7 @@
-https://img.shields.io/badge/License-MIT-yellow.svg
-https://img.shields.io/badge/C%252B%252B-17-blue.svg
-https://img.shields.io/badge/CMake-3.15%252B-064F8C.svg
-https://img.shields.io/badge/Platform-Linux%2520%257C%2520Windows%2520%257C%2520macOS-blue.svg
-https://img.shields.io/github/issues/dethrandir23/craftr.svg
-https://img.shields.io/github/forks/dethrandir23/craftr.svg
-https://img.shields.io/github/stars/dethrandir23/craftr.svg
-https://img.shields.io/github/contributors/dethrandir23/craftr.svg
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![C++ Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+[![CMake Version](https://img.shields.io/badge/CMake-3.15%2B-064F8C.svg)](https://cmake.org/)
+[![Platform Support](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-blue.svg)](https://github.com/dethrandir23/craftr)
 
 # Craftr 🛠️
 
