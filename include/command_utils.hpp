@@ -1,3 +1,4 @@
+//command_utils.hpp
 #include "metadata.hpp"
 #include <cstdlib>
 #include <exception>
@@ -9,14 +10,24 @@
 
 namespace CommandUtils {
 
+#ifdef _WIN32
+    inline std::string hide_cmd = " > nul 2>&1";
+#else
+    inline std::string hide_cmd = " > /dev/null 2>&1";
+#endif
+
 constexpr const char *GREEN = "\033[32m";
 constexpr const char *RED = "\033[31m";
 constexpr const char *RESET = "\033[0m";
 
 enum class CommandMode { Cautious, ExecuteAll };
 
-inline bool run_command(const std::string &cmd) {
-  int ret = system(cmd.c_str());
+inline bool run_command(const std::string &cmd, bool silent_mode) {
+  std::string final_cmd = cmd;
+  if (silent_mode) {
+    final_cmd += hide_cmd;
+  }
+  int ret = system(final_cmd.c_str());
   if (ret == 0) {
     std::cout << GREEN << "[OK] " << RESET << cmd << std::endl;
     return true;
@@ -28,11 +39,11 @@ inline bool run_command(const std::string &cmd) {
 }
 
 inline bool run_commands(const std::vector<std::string> &commands,
-                         CommandMode mode = CommandMode::Cautious) {
+                         CommandMode mode, bool silent_mode) {
   bool all_ok = true;
 
   for (const auto &cmd : commands) {
-    bool ok = run_command(cmd);
+    bool ok = run_command(cmd, silent_mode);
 
     if (!ok) {
       std::cerr << "Command failed:" << cmd << std::endl;
