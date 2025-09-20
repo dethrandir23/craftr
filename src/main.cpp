@@ -29,64 +29,130 @@
 #include "../include/project_utils.hpp"
 #include "../include/string_utils.hpp"
 #include "../include/template_utils.hpp"
+#include "../include/validate_utils.hpp"
 #include <iostream>
-#include <ostream>
 #include <string>
+#include <vector>
 
-int main(int argc, char **argv) {
-  Cliopatra cliopatra;
-  cliopatra.addOption("h", "help", Cliopatra::Option::bool_o);
-  cliopatra.addOption("v", "version", Cliopatra::Option::bool_o);
-  cliopatra.addOption("c", "create", Cliopatra::Option::bool_o);
-  cliopatra.addOption("a", "add", Cliopatra::Option::string_o);
-  cliopatra.addOption("b", "build", Cliopatra::Option::string_o);
-  cliopatra.addOption("co", "config", Cliopatra::Option::string_o);
-  cliopatra.addOption("t", "template", Cliopatra::Option::string_o);
+// ---------------- Helper Functions ----------------
 
-  try {
-    auto results = cliopatra.parse(argc, argv);
+bool ensureTemplateProvided(const Cliopatra::ParsedMap& results) {
+    if (results.find("template") == results.end()) {
+        std::cerr << "[ERROR] You must specify a template name using --template" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+int handleValidate(const std::string& templates_dir,
+                   const std::string& templateName) {
+    auto templatePathOpt = TemplateUtils::FindTemplateByName(templates_dir, templateName);
+    if (!templatePathOpt.has_value()) {
+        std::cerr << "[ERROR] Template not found: " << templateName << std::endl;
+        return 1;
+    }
+
+    std::vector<std::string> errors;
+    ValidateUtils::ValidateTemplate(templatePathOpt.value(), errors);
+
+    if (errors.empty()) {
+        std::cout << "[OK] Template '" << templateName << "' is valid ✅" << std::endl;
+    } else {
+        std::cout << "[FAIL] Template validation errors:\n";
+        for (const auto& e : errors) {
+            std::cout << "  - " << e << std::endl;
+        }
+        return 1;
+    }
+
+    return 0;
+}
+
+int handleCreate(const std::string& templates_dir,
+                 const std::string& templateName) {
     Config config;
-    auto templates_dir = "../templates/config/craftr";
-    if (results.find("create") != results.end()) {
-      if (results.find("template") == results.end()) {
-        std::cerr << "You must enter a template name to create the project"
-                  << std::endl;
-      }
-      config.templatePath =
-          TemplateUtils::FindTemplateByName(
-              templates_dir, std::get<std::string>(results["template"]))
-              .value();
-      for (auto valuetoask : TemplateUtils::GetTemplateReplacerTypes(
-               templates_dir, std::get<std::string>(results["template"]))) {
-        if (valuetoask == "DATE") {
-          config.variables[valuetoask] = DateUtils::GetCurrentYearStr();
-          continue;
+
+    auto templatePathOpt = TemplateUtils::FindTemplateByName(templates_dir, templateName);
+    if (!templatePathOpt.has_value()) {
+        std::cerr << "[ERROR] Template not found: " << templateName << std::endl;
+        return 1;
+    }
+    config.templatePath = templatePathOpt.value();
+
+    // Fill variables interactively
+    for (auto key : TemplateUtils::GetTemplateReplacerTypes(templates_dir, templateName)) {
+        if (key == "DATE") {
+            config.variables[key] = DateUtils::GetCurrentYearStr();
+            continue;
         }
         std::string input;
-        std::cout << "Enter the " << valuetoask << " : ";
+        std::cout << "Enter the " << key << ": ";
         std::getline(std::cin, input);
-        config.variables[valuetoask] = input;
-        if (valuetoask == "PROJECT_NAME") {
-          config.name = StringUtils::trim(input);
+        config.variables[key] = input;
+        if (key == "PROJECT_NAME") {
+            config.name = StringUtils::trim(input);
         }
-      }
-      std::string input;
-      std::cout << "Select your license type: " << std::endl;
-      for (auto l : LicenseUtils::GetLicenseTypes()) {
-        std::cout << "- " << l << std::endl;
-      }
-      std::cout << "Selected license (if you don't want one, press enter): "
-                << std::endl;
-      std::getline(std::cin, input);
-      config.license = StringUtils::trim(input) == "" ? config.license = "none"
-                                                      : config.license = input;
     }
-    ProjectUtils::create_project(config);
-  } catch (...) {
-    std::cerr << "Parsing command line arguments or executing them."
-              << std::endl;
-    return 1;
-  }
 
-  return 0;
+    // License
+    std::cout << "Select your license type:\n";
+    for (auto l : LicenseUtils::GetLicenseTypes()) {
+        std::cout << "- " << l << "\n";
+    }
+    std::cout << "Selected license (press enter for none): ";
+    std::string input;
+    std::getline(std::cin, input);
+    config.license = StringUtils::trim(input).empty() ? "none" : StringUtils::trim(input);
+
+    ProjectUtils::create_project(config);
+    return 0;
+}
+
+// ---------------- Main ----------------
+
+int main(int argc, char **argv) {
+    Cliopatra cli;
+    cli.addOption("h", "help", Cliopatra::Option::bool_o);
+    cli.addOption("v", "version", Cliopatra::Option::bool_o);
+    cli.addOption("c", "create", Cliopatra::Option::bool_o);
+    cli.addOption("a", "add", Cliopatra::Option::string_o);
+    cli.addOption("b", "build", Cliopatra::Option::string_o);
+    cli.addOption("co", "config", Cliopatra::Option::string_o);
+    cli.addOption("v", "validate", Cliopatra::Option::bool_o);
+    cli.addOption("t", "template", Cliopatra::Option::string_o);
+
+    auto templates_dir = "../templates/config/craftr";
+
+    try {
+        auto results = cli.parse(argc, argv);
+
+        if (results.find("help") != results.end()) {
+            OutputUtils::print_help();
+            return 0;
+        }
+        if (results.find("version") != results.end()) {
+            OutputUtils::print_version();
+            return 0;
+        }
+
+        if (results.find("validate") != results.end()) {
+            if (!ensureTemplateProvided(results)) return 1;
+            return handleValidate(templates_dir, std::get<std::string>(results.at("template")));
+        }
+
+        if (results.find("create") != results.end()) {
+            if (!ensureTemplateProvided(results)) return 1;
+            return handleCreate(templates_dir, std::get<std::string>(results.at("template")));
+        }
+
+        std::cerr << "[ERROR] No command provided. Use --help for usage." << std::endl;
+        return 1;
+
+    } catch (const std::exception &e) {
+        std::cerr << "[EXCEPTION] " << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "[ERROR] Unexpected failure while parsing arguments." << std::endl;
+        return 1;
+    }
 }
