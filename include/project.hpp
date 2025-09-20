@@ -23,6 +23,7 @@ private:
   std::vector<std::filesystem::path> subFolders;
 
   CommandUtils::CommandMode commandMode;
+  bool silent_mode;
   std::vector<std::string> commands;
 
   std::filesystem::path projectSubFolder;
@@ -34,6 +35,8 @@ public:
     replacers = t.GetReplacers();
     subFolders = t.GetSubFolders();
     commands = t.getCommands();
+    commandMode = t.getCommandMode();
+    silent_mode = t.getSilentMode();
   }
 
   const std::string &getName() const { return name; }
@@ -81,6 +84,9 @@ public:
   }
 
   void setCommands(const std::vector<std::string> &c) { this->commands = c; }
+
+  bool getSilentMode() const { return this->silent_mode; }
+  void setSilentMode(bool sm) { this->silent_mode = sm; }
 
   void createCommands();
   void createContentFiles();

@@ -64,6 +64,18 @@ bool ProjectTemplate::LoadTemplate() {
       }
     }
 
+    if (config["silent_mode"]) {
+      if(config["silent_mode"].as<std::string>() == "true") {
+        silent_mode = true;
+      } else if (config["silent_mode"].as<std::string>() == "false"){
+        silent_mode = false;
+      } else {
+        silent_mode = false;
+      }
+    } else {
+      silent_mode = false;
+    }
+
     if (config["commands"]) {
       for (auto it : config["commands"]) {
         commands.emplace_back(it.as<std::string>());

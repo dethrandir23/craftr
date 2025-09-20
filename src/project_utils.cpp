@@ -31,9 +31,12 @@ bool create_project(const Config &config) {
       return false;
     }
 
+    std::string is = (project.getSilentMode()) ? "true" : "false";
+    std::cout << is << std::endl;
     project.createCommands();
     if (!CommandUtils::run_commands(project.getCommands(),
-                                    project.getCommandMode())) {
+                                    project.getCommandMode(),
+                                    project.getSilentMode())) {
       std::cerr << "Failed to execute commands of template.\n";
       return false;
     } else {

@@ -99,6 +99,9 @@ public:
     this->commandMode = cm;
   }
 
+  bool getSilentMode() const { return this->silent_mode; }
+  void setSilentMode(bool sm) { this->silent_mode = sm; }
+
 private:
   std::string name = "";
   std::string version = "";
@@ -109,8 +112,10 @@ private:
 
   std::vector<std::filesystem::path> subfolders;
   std::vector<FileBlueprint> file_blueprints;
+
   std::vector<std::string> commands;
   CommandUtils::CommandMode commandMode;
+  bool silent_mode;
 
   std::map<std::string, std::string> licenses;
 
