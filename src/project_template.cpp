@@ -3,6 +3,7 @@
 #include "../include/project_template.hpp"
 #include <iostream>
 #include <string>
+#include <utility>
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/yaml.h>
 
@@ -65,9 +66,9 @@ bool ProjectTemplate::LoadTemplate() {
     }
 
     if (config["silent_mode"]) {
-      if(config["silent_mode"].as<std::string>() == "true") {
+      if (config["silent_mode"].as<std::string>() == "true") {
         silent_mode = true;
-      } else if (config["silent_mode"].as<std::string>() == "false"){
+      } else if (config["silent_mode"].as<std::string>() == "false") {
         silent_mode = false;
       } else {
         silent_mode = false;
@@ -78,7 +79,16 @@ bool ProjectTemplate::LoadTemplate() {
 
     if (config["commands"]) {
       for (auto it : config["commands"]) {
-        commands.emplace_back(it.as<std::string>());
+        if (it["command"]) {
+          if (it["description"]) {
+            commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(),
+                               it["description"].as<std::string>()));
+          } else {
+            commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(), ""));
+          }
+        }
       }
     }
 

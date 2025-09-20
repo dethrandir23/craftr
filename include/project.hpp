@@ -24,7 +24,7 @@ private:
 
   CommandUtils::CommandMode commandMode;
   bool silent_mode;
-  std::vector<std::string> commands;
+  std::vector<std::pair<std::string, std::string>> commands;
 
   std::filesystem::path projectSubFolder;
   ProjectTemplate tmpl;
@@ -58,7 +58,7 @@ public:
   }
 
   std::vector<Replacer> &getReplacers() { return this->replacers; }
-  std::vector<std::string> &getCommands() { return this->commands; }
+  std::vector<std::pair<std::string, std::string>> &getCommands() { return this->commands; }
 
   void setName(const std::string &n) { name = n; }
   void setVersion(const std::string &v) { version = v; }
@@ -83,7 +83,7 @@ public:
     this->commandMode = cm;
   }
 
-  void setCommands(const std::vector<std::string> &c) { this->commands = c; }
+  void setCommands(const std::vector<std::pair<std::string, std::string>> &c) { this->commands = c; }
 
   bool getSilentMode() const { return this->silent_mode; }
   void setSilentMode(bool sm) { this->silent_mode = sm; }

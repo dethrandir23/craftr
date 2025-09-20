@@ -90,9 +90,9 @@ public:
     licenses = new_licenses;
   }
 
-  std::vector<std::string> getCommands() const { return this->commands; }
+  std::vector<std::pair<std::string, std::string>> getCommands() const { return this->commands; }
 
-  void setCommands(const std::vector<std::string> &c) { this->commands = c; }
+  void setCommands(const std::vector<std::pair<std::string, std::string>> &c) { this->commands = c; }
 
   CommandUtils::CommandMode getCommandMode() const { return this->commandMode; }
   void setCommandMode(const CommandUtils::CommandMode &cm) {
@@ -113,7 +113,7 @@ private:
   std::vector<std::filesystem::path> subfolders;
   std::vector<FileBlueprint> file_blueprints;
 
-  std::vector<std::string> commands;
+  std::vector<std::pair<std::string, std::string>> commands;
   CommandUtils::CommandMode commandMode;
   bool silent_mode;
 
