@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "colors.hpp"
 
 #pragma once
 
@@ -17,9 +18,6 @@ inline std::string hide_cmd = " > nul 2>&1";
 inline std::string hide_cmd = " > /dev/null 2>&1";
 #endif
 
-inline constexpr const char *GREEN = "\033[32m";
-inline constexpr const char *RED = "\033[31m";
-inline constexpr const char *RESET = "\033[0m";
 
 enum class CommandMode { Cautious, ExecuteAll };
 
@@ -28,10 +26,10 @@ inline bool run_command(const std::string &cmd, bool silent_mode) {
 
   int ret = system(final_cmd.c_str());
   if (ret == 0) {
-    std::cout << GREEN << "[OK] " << RESET << cmd << std::endl;
+    std::cout << Colors::GREEN << "[OK] " << Colors::RESET << cmd << std::endl;
     return true;
   } else {
-    std::cout << RED << "[FAIL] " << RESET << cmd << " (code: " << ret << ")"
+    std::cout << Colors::RED << "[FAIL] " << Colors::RESET << cmd << " (code: " << ret << ")"
               << std::endl;
     return false;
   }
@@ -60,7 +58,7 @@ inline bool run_command_with_description(const std::string &cmd,
                                          const std::string &description,
                                          bool silent_mode) {
   if (!description.empty()) {
-    std::cout << GREEN << "[INFO]" << RESET << description << std::endl;
+    std::cout << Colors::GREEN << "[INFO]" << Colors::RESET << description << std::endl;
   }
   if (!run_command(cmd, silent_mode)) {
     return false;
