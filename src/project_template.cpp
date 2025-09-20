@@ -57,10 +57,12 @@ bool ProjectTemplate::LoadTemplate() {
       } else if (config["command_mode"].as<std::string>() == "execute_all") {
         commandMode = CommandUtils::CommandMode::ExecuteAll;
       } else {
-        std::cerr << "Unknown command mode in your template file. please set "
-                     "it to \"cautious\" or \"execute_all\" "
-                  << std::endl;
-        std::cerr << "Craftr sets command mode to cautious now." << std::endl;
+        if (config["commands"]) {
+          std::cerr << "Unknown command mode in your template file. please set "
+                       "it to \"cautious\" or \"execute_all\" "
+                    << std::endl;
+          std::cerr << "Craftr sets command mode to cautious now." << std::endl;
+        }
         commandMode = CommandUtils::CommandMode::Cautious;
       }
     }
