@@ -42,8 +42,12 @@ files:
 
 
 command_mode: cautious
+silent_mode: true
 
 commands:
-  - "cd {{PROJECT_NAME}} && git init"
-  - "cd {{PROJECT_NAME}} && git add ."
-  - "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
+  - command: "cd {{PROJECT_NAME}} && git init"
+    description: "Initializing Git repository for {{PROJECT_NAME}}..."
+  - command: "cd {{PROJECT_NAME}} && git add ."
+    description: "Staging files for first commit..."
+  - command: "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
+    description: "Creating first commit..."
