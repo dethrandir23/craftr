@@ -32,24 +32,25 @@ bool create_project(const Config &config) {
       return false;
     }
 
-    // std::string is = (project.getSilentMode()) ? "true" : "false";
-    // std::cout << is << std::endl;
     project.createCommands();
     if (!CommandUtils::run_commands_with_description(project.getCommands(),
                                                      project.getCommandMode(),
                                                      project.getSilentMode())) {
-      std::cerr << "Failed to execute commands of template.\n";
+      std::cerr << Colors::RED << "[ERROR]" << Colors::RESET
+                << "Failed to execute commands of template." << std::endl;
       return false;
     } else {
-      std::cout << "Executed all commands with success." << std::endl;
+      std::cout << Colors::GREEN << "[SUCCESS]" << Colors::RESET
+                << "Executed all commands with success." << std::endl;
     }
 
   } catch (const std::exception &e) {
-    std::cerr << "Error creating project: " << e.what() << std::endl;
+    std::cerr << Colors::RED << "[ERROR]" << Colors::RESET
+              << "Error creating project: " << e.what() << std::endl;
     return false;
   }
-  std::cout << "Project '" << config.name << "' created successfully!"
-            << std::endl;
+  std::cout << Colors::GREEN << "[SUCCESS]" << Colors::RESET << "Project '"
+            << config.name << "' created successfully!" << std::endl;
   return true;
 }
 } // namespace ProjectUtils
