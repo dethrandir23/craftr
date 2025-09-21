@@ -1,4 +1,6 @@
 // command_utils.hpp
+#include "../libs/localita/include/Localita.hpp"
+#include "colors.hpp"
 #include "metadata.hpp"
 #include <cstdlib>
 #include <exception>
@@ -6,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "colors.hpp"
 
 #pragma once
 
@@ -18,32 +19,34 @@ inline std::string hide_cmd = " > nul 2>&1";
 inline std::string hide_cmd = " > /dev/null 2>&1";
 #endif
 
-
 enum class CommandMode { Cautious, ExecuteAll };
 
-inline bool run_command(const std::string &cmd, bool silent_mode) {
+inline bool run_command(const std::string &cmd, bool silent_mode,
+                        Localita &loc) {
   std::string final_cmd = silent_mode ? cmd + hide_cmd : cmd;
 
   int ret = system(final_cmd.c_str());
   if (ret == 0) {
-    std::cout << Colors::GREEN << "[OK] " << Colors::RESET << cmd << std::endl;
+    std::cout << Colors::GREEN << "[" << loc.getText("OK") << "] "
+              << Colors::RESET << cmd << std::endl;
     return true;
   } else {
-    std::cout << Colors::RED << "[FAIL] " << Colors::RESET << cmd << " (code: " << ret << ")"
-              << std::endl;
+    std::cout << Colors::RED << "[" << loc.getText("FAIL") << "] "
+              << Colors::RESET << cmd << " (" << loc.getText("CODE") << ": "
+              << ret << ")" << std::endl;
     return false;
   }
 }
 
 inline bool run_commands(const std::vector<std::string> &commands,
-                         CommandMode mode, bool silent_mode) {
+                         CommandMode mode, bool silent_mode, Localita &loc) {
   bool all_ok = true;
 
   for (const auto &cmd : commands) {
-    bool ok = run_command(cmd, silent_mode);
+    bool ok = run_command(cmd, silent_mode, loc);
 
     if (!ok) {
-      std::cerr << "Command failed:" << cmd << std::endl;
+      std::cerr << loc.getText("COMMAND_FAILED") << ": " << cmd << std::endl;
       all_ok = false;
       if (mode == CommandMode::Cautious) {
         return false;
@@ -56,26 +59,29 @@ inline bool run_commands(const std::vector<std::string> &commands,
 
 inline bool run_command_with_description(const std::string &cmd,
                                          const std::string &description,
-                                         bool silent_mode) {
+                                         bool silent_mode, Localita &loc) {
   if (!description.empty()) {
-    std::cout << Colors::GREEN << "[INFO]" << Colors::RESET << description << std::endl;
+    std::cout << Colors::GREEN << "[" << loc.getText("INFO") << "]"
+              << Colors::RESET << " " << description << std::endl;
   }
-  if (!run_command(cmd, silent_mode)) {
+  if (!run_command(cmd, silent_mode, loc)) {
     return false;
   }
   return true;
 }
 
 inline bool run_commands_with_description(
-    const std::vector<std::pair<std::string, std::string>> &commands, CommandMode mode,
-    bool silent_mode) {
+    const std::vector<std::pair<std::string, std::string>> &commands,
+    CommandMode mode, bool silent_mode, Localita &loc) {
   bool all_ok = true;
 
   for (const auto &cmd : commands) {
-    bool ok = run_command_with_description(cmd.first, cmd.second, silent_mode);
+    bool ok =
+        run_command_with_description(cmd.first, cmd.second, silent_mode, loc);
 
     if (!ok) {
-      std::cerr << "Command failed:" << cmd.first << std::endl;
+      std::cerr << loc.getText("COMMAND_FAILED") << ": " << cmd.first
+                << std::endl;
       all_ok = false;
       if (mode == CommandMode::Cautious) {
         return false;

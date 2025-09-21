@@ -5,20 +5,21 @@
 #include <iostream>
 #include <string>
 
+#include "../include/command_utils.hpp"
 #include "../include/config.hpp"
 #include "../include/file_utils.hpp"
 #include "../include/project.hpp"
 #include "../include/project_template.hpp"
 #include "../include/replacer_utils.hpp"
-#include "command_utils.hpp"
+#include "../libs/localita/include/Localita.hpp"
 
 namespace ProjectUtils {
 
-bool create_project(const Config &config) {
+bool create_project(const Config &config, Localita &loc) {
   try {
     ProjectTemplate tmpl(config.templatePath);
     if (!tmpl.LoadTemplate()) {
-      std::cerr << "Failed to load template\n";
+      std::cerr << loc.getText("FAILED_TO_LOAD_TEMPLATE") << std::endl;
       return false;
     }
     Project project(tmpl); //! Project uses old system, fix it later
@@ -28,29 +29,34 @@ bool create_project(const Config &config) {
     ReplacerUtils::FillReplacersFromConfig(project.getReplacers(), config);
     project.createContentFiles();
     if (!FileUtils::write_project(project)) {
-      std::cerr << "Something went wrong while writing project." << std::endl;
+      std::cerr << loc.getText("SOMETHING_WENT_WRONG") << std::endl;
       return false;
     }
 
     project.createCommands();
-    if (!CommandUtils::run_commands_with_description(project.getCommands(),
-                                                     project.getCommandMode(),
-                                                     project.getSilentMode())) {
-      std::cerr << Colors::RED << "[ERROR]" << Colors::RESET
-                << "Failed to execute commands of template." << std::endl;
+    if (!CommandUtils::run_commands_with_description(
+            project.getCommands(), project.getCommandMode(),
+            project.getSilentMode(), loc)) {
+      std::cerr << Colors::RED << "[" << loc.getText("ERROR") << "] "
+                << Colors::RESET << loc.getText("FAILED_TO_EXECUTE_COMMANDS")
+                << std::endl;
       return false;
     } else {
-      std::cout << Colors::GREEN << "[SUCCESS]" << Colors::RESET
-                << "Executed all commands with success." << std::endl;
+      std::cout << Colors::GREEN << "[" << loc.getText("SUCCESS") << "] "
+                << Colors::RESET
+                << loc.getText("EXECUTED_ALL_COMMANDS_WITH_SUCCESS")
+                << std::endl;
     }
 
   } catch (const std::exception &e) {
-    std::cerr << Colors::RED << "[ERROR]" << Colors::RESET
-              << "Error creating project: " << e.what() << std::endl;
+    std::cerr << Colors::RED << "[" << loc.getText("ERROR") << "] "
+              << Colors::RESET << loc.getText("ERROR_CREATING_PROJECT")
+              << e.what() << std::endl;
     return false;
   }
-  std::cout << Colors::GREEN << "[SUCCESS]" << Colors::RESET << "Project '"
-            << config.name << "' created successfully!" << std::endl;
+  std::cout << Colors::GREEN << "[" << loc.getText("SUCCESS") << "] "
+            << loc.getText("PROJECT") << "'" << config.name << "' "
+            << loc.getText("CREATED_SUCCESSFULLY") << std::endl;
   return true;
 }
 } // namespace ProjectUtils
