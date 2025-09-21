@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
     std::cerr << "Failed to load locale" << std::endl;
   }
 
-  auto templates_dir = "../templates/config/craftr";
+  auto templates_dir = FileUtils::get_templates_folder();
 
   try {
     auto results = cli.parse(argc, argv);

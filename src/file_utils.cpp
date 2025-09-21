@@ -48,12 +48,6 @@ std::string LoadFileToString(const std::string &filepath) {
   return buffer.str();
 }
 
-std::filesystem::path get_project_root() { return PROJECT_ROOT_DIR; }
-
-std::filesystem::path get_templates_folder() {
-  return get_project_root().append("templates");
-}
-
 bool write_content_files(const std::vector<ContentFile> &files,
                          const std::filesystem::path &basePath) {
   try {
@@ -238,6 +232,10 @@ std::filesystem::path getDataDir(const std::string &app_name) {
   }
 
   return data_path;
+}
+
+std::filesystem::path get_templates_folder() {
+  return getDataDir(StringUtils::toLower(Metadata::name())).append("templates");
 }
 
 } // namespace FileUtils
