@@ -5,6 +5,9 @@
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 namespace {
 std::filesystem::path getDataDir(const std::string &app_name) {

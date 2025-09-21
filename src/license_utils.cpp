@@ -1,6 +1,7 @@
 // license_utils.cpp
 #include "../include/file_utils.hpp"
 #include "../include/string_utils.hpp"
+#include "../include/metadata.hpp"
 #include <algorithm>
 #include <optional>
 #include <string>

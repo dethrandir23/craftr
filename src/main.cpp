@@ -22,7 +22,6 @@
 
 #include "../include/Cliopatra.hpp"
 #include "../include/config.hpp"
-#include "../include/config_utils.hpp"
 #include "../include/file_utils.hpp"
 #include "../include/license_utils.hpp"
 #include "../include/locale_utils.hpp"
@@ -32,6 +31,7 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
+#include "../include/metadata.hpp"
 #include <iostream>
 #include <ostream>
 #include <string>

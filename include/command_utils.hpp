@@ -1,11 +1,8 @@
 // command_utils.hpp
 #include "../libs/localita/include/Localita.hpp"
 #include "colors.hpp"
-#include "metadata.hpp"
 #include <cstdlib>
-#include <exception>
 #include <iostream>
-#include <map>
 #include <string>
 #include <vector>
 

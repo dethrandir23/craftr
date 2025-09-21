@@ -1,12 +1,16 @@
 // file_utils.cpp
 #include "../include/file_utils.hpp"
 #include "../include/project.hpp"
+#include "../include/metadata.hpp"
 #include "../include/string_utils.hpp"
 #include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 namespace FileUtils {
 bool create_file(const std::filesystem::path &path, const std::string &filename,
