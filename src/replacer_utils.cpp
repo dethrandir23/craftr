@@ -1,6 +1,6 @@
 // replacer_utils.cpp
-#include "replacer_utils.hpp"
-#include "replacer.hpp"
+#include "../include/replacer_utils.hpp"
+#include "../include/replacer.hpp"
 #include <vector>
 
 namespace ReplacerUtils {
