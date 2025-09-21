@@ -30,15 +30,15 @@ subfolders:
 
 files:
   - target: "CMakeLists.txt"
-    template: "cmake/CMake_Template.txt"
+    template: "cpp/CMake_Template.txt"
   - target: "src/main.cpp"
     template: "cpp/main.txt"
   - target: "README.md"
-    template: "readme/Readme.txt"
+    template: "cpp/Readme.txt"
   - target: "LICENSE"
     template: "license"
   - target: "metadata/metadata.json"
-    template: "metadata/metadata.txt"
+    template: "cpp/metadata.txt"
 
 
 command_mode: cautious
