@@ -1,0 +1,3 @@
+[submodule "libs/localita"]
+	path = libs/localita
+	url = https://github.com/dethrandir23/localita.git
