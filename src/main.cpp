@@ -33,6 +33,7 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
+#include <exception>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -279,6 +280,7 @@ int main(int argc, char **argv) {
   cli.addOption("t", "template", Cliopatra::Option::string_o);
   cli.addOption("l", "language", Cliopatra::Option::string_o);
   cli.addOption("p", "pull", Cliopatra::Option::multi_string_o);
+  cli.addOption("r", "remote", Cliopatra::Option::string_o);
 
   Localita loc;
   loc.setLocalePath(
@@ -320,6 +322,12 @@ int main(int argc, char **argv) {
     }
     //! update
     if (results.find("validate") != results.end()) {
+      if (results.find("remote") != results.end()) {
+        std::cerr
+            << "You can only validate local templates! Pull the template first."
+            << std::endl;
+        return 1;
+      }
       if (!ensureTemplateProvided(results, loc))
         return 1;
       return handleValidate(template_directories,
@@ -327,6 +335,21 @@ int main(int argc, char **argv) {
     }
 
     if (results.find("create") != results.end()) {
+      if (results.find("remote") != results.end()) {
+        auto link = std::get<std::string>(results.at("remote"));
+        auto repo_name = GitUtils::getRepoNameFromUrl(link);
+        try {
+          handlePull({"template", link});
+        } catch (const std::exception &e) {
+          std::cerr << e.what() << std::endl;
+          std::cerr << "Something went wrong while pulling the template."
+                    << std::endl;
+          return 1;
+        }
+        auto template_dir = std::vector<std::filesystem::path>{
+            FileUtils::get_templates_folder().append("remote").append(repo_name)};
+        return handleCreate(template_dir, repo_name, loc);
+      }
       if (!ensureTemplateProvided(results, loc))
         return 1;
       return handleCreate(template_directories,
