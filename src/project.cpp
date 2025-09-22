@@ -19,6 +19,7 @@ void Project::createCommands() {
 }
 
 void Project::createContentFiles() {
+  auto templateRoot = this->tmpl.getTemplateRoot();
   for (auto &fbp : this->tmpl.GetFileBluePrints()) {
     if (fbp.target_path == "LICENSE") {
       if (getLicenseType() == "none") {
@@ -44,13 +45,22 @@ void Project::createContentFiles() {
           ContentFile(Content(filledLicense), fbp.target_path));
       continue;
     }
-    std::filesystem::path fullTemplatePath =
-        FileUtils::get_templates_folder() / fbp.template_path;
 
-    contentFiles.emplace_back(
-        ContentFile(Content(TemplateEngine::fillContent(
-                        FileUtils::LoadFileToString(fullTemplatePath.string()),
-                        this->replacers)),
-                    fbp.target_path));
+    std::optional<std::filesystem::path> fullTemplatePathOpt =
+        this->tmpl.resolveTemplatePath(fbp.template_path);
+
+    if (!fullTemplatePathOpt.has_value()) {
+      std::cerr << "Can't open file: " << fbp.template_path
+                << " (resolved relative to " << this->tmpl.GetTemplatePath()
+                << ")\n";
+      continue;
+    }
+
+    auto fullTemplatePath = fullTemplatePathOpt.value();
+    std::string fileContent =
+        FileUtils::LoadFileToString(fullTemplatePath.string());
+    contentFiles.emplace_back(ContentFile(
+        Content(TemplateEngine::fillContent(fileContent, this->replacers)),
+        fbp.target_path));
   }
-}   
+}

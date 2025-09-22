@@ -1,6 +1,6 @@
 // template_utils.cpp
+#include "../include/template_utils.hpp"
 #include "../include/project_template.hpp"
-  #include "../include/template_utils.hpp"
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -23,15 +23,57 @@ FindTemplateByName(const std::filesystem::path &directory,
             }
           }
         }
-      } catch (const YAML::Exception& e) {
-        std::cerr << "YAML error in " << entry.path() << ": " << e.what() << "\n";
+      } catch (const YAML::Exception &e) {
+        std::cerr << "YAML error in " << entry.path() << ": " << e.what()
+                  << "\n";
         continue;
       }
     }
-  } catch (const std::filesystem::filesystem_error& e) {
+  } catch (const std::filesystem::filesystem_error &e) {
     std::cerr << "Directory error: " << e.what() << "\n";
   }
   return std::nullopt;
+}
+
+std::vector<std::filesystem::path>
+FindTemplatesByName(const std::vector<std::filesystem::path> &directories,
+                    const std::string &name) {
+  std::vector<std::filesystem::path> results;
+
+  for (const auto &directory : directories) {
+    if (!std::filesystem::exists(directory) ||
+        !std::filesystem::is_directory(directory)) {
+      continue;
+    }
+
+    try {
+      for (const auto &entry :
+           std::filesystem::recursive_directory_iterator(directory)) {
+        try {
+          if (!entry.is_regular_file())
+            continue;
+
+          const auto ext = entry.path().extension();
+          if (ext == ".yml" || ext == ".yaml") {
+            YAML::Node tmp = YAML::LoadFile(entry.path().string());
+            if (tmp["name"] && tmp["name"].as<std::string>() == name) {
+              results.push_back(entry.path());
+            }
+          }
+        } catch (const YAML::Exception &e) {
+          std::cerr << "YAML error in " << entry.path() << ": " << e.what()
+                    << "\n";
+          continue;
+        }
+      }
+    } catch (const std::filesystem::filesystem_error &e) {
+      std::cerr << "Directory iteration error for " << directory << ": "
+                << e.what() << "\n";
+      continue;
+    }
+  }
+
+  return results;
 }
 
 // ProjectTemplate LoadProjectTemplate(const xYAML::Node &yml) { return; } //

@@ -6,6 +6,7 @@
 #include "replacer.hpp"
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -13,9 +14,17 @@ class ProjectTemplate {
 public:
   ProjectTemplate(const std::filesystem::path &path) {
     this->template_path = path;
+    this->commandMode = CommandUtils::CommandMode::Cautious;
+    this->silent_mode = false;
   }
 
   bool LoadTemplate();
+
+  std::filesystem::path getTemplateRoot() const {
+    return template_path.parent_path();
+  }
+  std::optional<std::filesystem::path>
+  resolveTemplatePath(const std::string &tmpl) const;
 
   const std::filesystem::path GetTemplatePath() const { return template_path; }
   const std::string &GetName() const { return this->name; }
@@ -90,9 +99,13 @@ public:
     licenses = new_licenses;
   }
 
-  std::vector<std::pair<std::string, std::string>> getCommands() const { return this->commands; }
+  std::vector<std::pair<std::string, std::string>> getCommands() const {
+    return this->commands;
+  }
 
-  void setCommands(const std::vector<std::pair<std::string, std::string>> &c) { this->commands = c; }
+  void setCommands(const std::vector<std::pair<std::string, std::string>> &c) {
+    this->commands = c;
+  }
 
   CommandUtils::CommandMode getCommandMode() const { return this->commandMode; }
   void setCommandMode(const CommandUtils::CommandMode &cm) {

@@ -1,11 +1,34 @@
 // project_template.cpp
 
 #include "../include/project_template.hpp"
+#include "../include/file_utils.hpp"
 #include <iostream>
 #include <string>
 #include <utility>
 #include <yaml-cpp/node/parse.h>
 #include <yaml-cpp/yaml.h>
+
+std::optional<std::filesystem::path> ProjectTemplate::resolveTemplatePath(const std::string &tmpl) const {
+  try {
+    std::filesystem::path p(tmpl);
+    if (p.is_absolute()) {
+      if (std::filesystem::exists(p)) return p;
+      return std::nullopt;
+    }
+
+    auto root = this->getTemplateRoot();
+    std::filesystem::path candidate = root / tmpl;
+    if (std::filesystem::exists(candidate)) return candidate;
+
+    std::filesystem::path global_candidate = FileUtils::get_templates_folder() / tmpl;
+    if (std::filesystem::exists(global_candidate)) return global_candidate;
+
+    return std::nullopt;
+  } catch (const std::filesystem::filesystem_error &e) {
+    std::cerr << "Filesystem error while resolving template path '" << tmpl << "': " << e.what() << std::endl;
+    return std::nullopt;
+  }
+}
 
 bool ProjectTemplate::LoadTemplate() {
   try {

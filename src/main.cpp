@@ -23,15 +23,16 @@
 #include "../include/Cliopatra.hpp"
 #include "../include/config.hpp"
 #include "../include/file_utils.hpp"
+#include "../include/git_utils.hpp"
 #include "../include/license_utils.hpp"
 #include "../include/locale_utils.hpp"
+#include "../include/metadata.hpp"
 #include "../include/output_utils.hpp"
 #include "../include/project_utils.hpp"
 #include "../include/string_utils.hpp"
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
-#include "../include/metadata.hpp"
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -49,25 +50,46 @@ bool ensureTemplateProvided(const Cliopatra::ParsedMap &results,
   return true;
 }
 
-int handleValidate(const std::string &templates_dir,
-                   const std::string &templateName, Localita &loc) {
-  auto templatePathOpt =
-      TemplateUtils::FindTemplateByName(templates_dir, templateName);
-  if (!templatePathOpt.has_value()) {
+int handleValidate(
+    const std::vector<std::filesystem::path> &templates_directories,
+    const std::string &templateName, Localita &loc) {
+
+  auto templates =
+      TemplateUtils::FindTemplatesByName(templates_directories, templateName);
+
+  if (templates.empty()) {
     std::cerr << "[" << loc.getText("ERROR") << "] "
               << loc.getText("TEMPLATE_NOT_FOUND") << templateName << std::endl;
     return 1;
   }
 
+  std::filesystem::path templateToValidate;
+  if (templates.size() > 1) {
+    std::cout << "Multiple templates with the same name found:\n";
+    for (size_t i = 0; i < templates.size(); ++i) {
+      std::cout << i + 1 << ". " << templates[i] << "\n";
+    }
+    std::cout << "Which one do you want to validate? [1-" << templates.size()
+              << "]: ";
+    int choice;
+    std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    templateToValidate = templates[choice - 1];
+  } else {
+    templateToValidate = templates.front();
+  }
+
   std::vector<std::string> errors;
-  ValidateUtils::ValidateTemplate(templatePathOpt.value(), errors, loc);
+  ValidateUtils::ValidateTemplate(templateToValidate, errors, loc);
 
   if (errors.empty()) {
-    std::cerr << "[" << loc.getText("OK") << "] " << loc.getText("TEMPLATE")
-              << templateName << loc.getText("IS_VALID") << std::endl;
+    std::cout << "[" << loc.getText("OK") << "] " << loc.getText("TEMPLATE")
+              << " '" << templateName << "' (" << templateToValidate.string()
+              << ")" << loc.getText("IS_VALID") << std::endl;
   } else {
     std::cout << "[" << loc.getText("FAIL") << "] "
-              << loc.getText("TEMPLATE_VALIDATION_ERROR") << std::endl;
+              << "Validation errors for template '" << templateName << "' ("
+              << templateToValidate.string() << "):" << std::endl;
     for (const auto &e : errors) {
       std::cout << "  - " << e << std::endl;
     }
@@ -76,23 +98,34 @@ int handleValidate(const std::string &templates_dir,
 
   return 0;
 }
-
-int handleCreate(const std::string &templates_dir,
-                 const std::string &templateName, Localita &loc) {
+int handleCreate(
+    const std::vector<std::filesystem::path> &templates_directories,
+    const std::string &templateName, Localita &loc) {
   Config config;
 
-  auto templatePathOpt =
-      TemplateUtils::FindTemplateByName(templates_dir, templateName);
-  if (!templatePathOpt.has_value()) {
+  auto templates =
+      TemplateUtils::FindTemplatesByName(templates_directories, templateName);
+
+  if (templates.empty()) {
     std::cerr << "[" << loc.getText("ERROR") << "] "
               << loc.getText("TEMPLATE_NOT_FOUND") << templateName << std::endl;
     return 1;
   }
-  config.templatePath = templatePathOpt.value();
+  config.templatePath = templates.front();
+  if (templates.size() > 1) {
+    std::cout << "Multiple templates found:\n";
+    for (size_t i = 0; i < templates.size(); ++i) {
+      std::cout << i + 1 << ". " << templates[i] << "\n";
+    }
+    std::cout << "Select one [1-" << templates.size() << "]: ";
+    int choice;
+    std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    config.templatePath = templates[choice - 1];
+  }
 
-  // Fill variables interactively
   for (auto key :
-       TemplateUtils::GetTemplateReplacerTypes(templates_dir, templateName)) {
+       TemplateUtils::GetTemplateReplacerTypes(config.templatePath)) {
     if (key == "DATE") {
       config.variables[key] = DateUtils::GetCurrentYearStr();
       continue;
@@ -106,7 +139,6 @@ int handleCreate(const std::string &templates_dir,
     }
   }
 
-  // License
   std::cout << loc.getText("LICENSE_TYPE_SELECTION") << std::endl;
   for (auto l : LicenseUtils::GetLicenseTypes()) {
     std::cout << "- " << l << "\n";
@@ -122,51 +154,117 @@ int handleCreate(const std::string &templates_dir,
 }
 
 int handleLanguage(const std::string &newLocale, Localita &loc) {
-    auto oldLoc = LocaleUtils::getPreferredLocale(loc);
-    
-    auto availableLocales = LocaleUtils::getAvailableLocales(loc);
-    bool isValidLocale = std::find(availableLocales.begin(), availableLocales.end(), newLocale) != availableLocales.end();
-    
-    if (newLocale == "system") {
-        if (LocaleUtils::setConfigLocale("system")) {
-            auto systemLocale = LocaleUtils::getSystemLocale();
-            std::cout << "[" << loc.getText("OK") << "] "
-                      << loc.getText("LANGUAGE_SET_TO_SYSTEM") << " (" 
-                      << systemLocale << ")" << std::endl;
-            return 0;
-        } else {
-            std::cerr << "[" << loc.getText("ERROR") << "] "
-                      << loc.getText("FAILED_TO_SET_LANGUAGE") << std::endl;
-            return 1;
-        }
+  auto oldLoc = LocaleUtils::getPreferredLocale(loc);
+
+  auto availableLocales = LocaleUtils::getAvailableLocales(loc);
+  bool isValidLocale =
+      std::find(availableLocales.begin(), availableLocales.end(), newLocale) !=
+      availableLocales.end();
+
+  if (newLocale == "system") {
+    if (LocaleUtils::setConfigLocale("system")) {
+      auto systemLocale = LocaleUtils::getSystemLocale();
+      std::cout << "[" << loc.getText("OK") << "] "
+                << loc.getText("LANGUAGE_SET_TO_SYSTEM") << " (" << systemLocale
+                << ")" << std::endl;
+      return 0;
+    } else {
+      std::cerr << "[" << loc.getText("ERROR") << "] "
+                << loc.getText("FAILED_TO_SET_LANGUAGE") << std::endl;
+      return 1;
     }
-    
-    if (isValidLocale) {
-        if (LocaleUtils::setConfigLocale(newLocale)) {
-            std::cout << "[" << loc.getText("OK") << "] "
-                      << loc.getText("LANGUAGE_SET_TO") << " '" << newLocale << "'"
-                      << std::endl;
-            return 0;
-        } else {
-            std::cerr << "[" << loc.getText("ERROR") << "] "
-                      << loc.getText("FAILED_TO_SET_LANGUAGE") << std::endl;
-            return 1;
-        }
+  }
+
+  if (isValidLocale) {
+    if (LocaleUtils::setConfigLocale(newLocale)) {
+      std::cout << "[" << loc.getText("OK") << "] "
+                << loc.getText("LANGUAGE_SET_TO") << " '" << newLocale << "'"
+                << std::endl;
+      return 0;
+    } else {
+      std::cerr << "[" << loc.getText("ERROR") << "] "
+                << loc.getText("FAILED_TO_SET_LANGUAGE") << std::endl;
+      return 1;
     }
-    
-    std::cerr << "[" << loc.getText("ERROR") << "] "
-              << loc.getText("SELECTED_LANGUAGE_NOT_EXISTS") << std::endl;
-    std::cerr << loc.getText("AVAILABLE_LANGUAGES") << std::endl;
-    
-    for (const auto &locale : availableLocales) {
-        std::cerr << "- " << locale << std::endl;
-    }
-    
-    std::cerr << loc.getText("OR_USE_SYSTEM_LANGUAGE") << std::endl;
-    
-    return 1;
+  }
+
+  std::cerr << "[" << loc.getText("ERROR") << "] "
+            << loc.getText("SELECTED_LANGUAGE_NOT_EXISTS") << std::endl;
+  std::cerr << loc.getText("AVAILABLE_LANGUAGES") << std::endl;
+
+  for (const auto &locale : availableLocales) {
+    std::cerr << "- " << locale << std::endl;
+  }
+
+  std::cerr << loc.getText("OR_USE_SYSTEM_LANGUAGE") << std::endl;
+
+  return 1;
 }
 
+int handlePull(const std::vector<std::string> &options) {
+  if (options.size() != 2) {
+    std::cerr << "Usage: craftr --pull <template/license> <remotelink/center>"
+              << std::endl;
+    return 1;
+  }
+  if (!GitUtils::isGitInstalled()) {
+    std::cerr
+        << "Git is not installed on your machine. Please install git first."
+        << std::endl;
+    return 1;
+  }
+
+  auto center_templates_repo =
+      "https://github.com/dethrandir23/community-templates";
+
+  if (StringUtils::toLower(options.front()) == "template") {
+    if (StringUtils::toLower(options.back()) == "center") {
+      if (!GitUtils::runGitCloneOrPull(center_templates_repo,
+                                       FileUtils::get_templates_folder().append(
+                                           "community-templates"))) {
+        std::cerr << "Something went wrong while downloading the templates."
+                  << std::endl;
+        return 1;
+      }
+      std::cout << "Successfully installed/updated community templates."
+                << std::endl;
+      return 0;
+    } else {
+      std::string repoUrl = options.back();
+      std::string repoName = GitUtils::getRepoNameFromUrl(repoUrl);
+
+      if (repoName.empty()) {
+        std::cerr << "Invalid repository URL format: " << repoUrl << std::endl;
+        return 1;
+      }
+
+      std::cout << "Repository name detected: " << repoName << std::endl;
+      std::cout << "Downloading into 'remote/" << repoName << "' directory..."
+                << std::endl;
+
+      auto targetPath =
+          FileUtils::get_templates_folder().append("remote").append(repoName);
+
+      if (!GitUtils::runGitCloneOrPull(repoUrl, targetPath)) {
+        std::cerr << "Something went wrong while cloning/pulling from "
+                  << repoUrl << std::endl;
+        return 1;
+      }
+
+      std::cout << "Successfully installed/updated template from " << repoUrl
+                << std::endl;
+      return 0;
+      //-------------------------------------------------------------
+    }
+  } else if (StringUtils::toLower(options.front()) == "license") {
+  } else {
+    std::cerr << "Please enter a valid option." << std::endl;
+    std::cerr << "Usage: craftr --pull <template/license> <remotelink/center>"
+              << std::endl;
+    return 1;
+  }
+  return 1;
+}
 // ---------------- Main ----------------
 
 int main(int argc, char **argv) {
@@ -180,6 +278,7 @@ int main(int argc, char **argv) {
   cli.addOption("v", "validate", Cliopatra::Option::bool_o);
   cli.addOption("t", "template", Cliopatra::Option::string_o);
   cli.addOption("l", "language", Cliopatra::Option::string_o);
+  cli.addOption("p", "pull", Cliopatra::Option::multi_string_o);
 
   Localita loc;
   loc.setLocalePath(
@@ -193,10 +292,20 @@ int main(int argc, char **argv) {
   }
 
   auto templates_dir = FileUtils::get_templates_folder();
+  std::vector<std::filesystem::path> template_directories = {
+      FileUtils::get_templates_folder().append("user"),
+      FileUtils::get_templates_folder().append("system"),
+      FileUtils::get_templates_folder().append("community-templates"),
+      FileUtils::get_templates_folder().append("remote"),
+
+  };
 
   try {
     auto results = cli.parse(argc, argv);
-    
+    if (results.find("pull") != results.end()) {
+      return handlePull(std::get<std::vector<std::string>>(results.at("pull")));
+    }
+
     if (results.find("language") != results.end()) {
       return handleLanguage(std::get<std::string>(results.at("language")), loc);
     }
@@ -209,18 +318,18 @@ int main(int argc, char **argv) {
       OutputUtils::print_version();
       return 0;
     }
-
+    //! update
     if (results.find("validate") != results.end()) {
       if (!ensureTemplateProvided(results, loc))
         return 1;
-      return handleValidate(templates_dir,
+      return handleValidate(template_directories,
                             std::get<std::string>(results.at("template")), loc);
     }
 
     if (results.find("create") != results.end()) {
       if (!ensureTemplateProvided(results, loc))
         return 1;
-      return handleCreate(templates_dir,
+      return handleCreate(template_directories,
                           std::get<std::string>(results.at("template")), loc);
     }
 
