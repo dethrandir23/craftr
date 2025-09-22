@@ -33,6 +33,7 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
+#include "links.hpp"
 #include <exception>
 #include <iostream>
 #include <ostream>
@@ -215,8 +216,7 @@ int handlePull(const std::vector<std::string> &options) {
     return 1;
   }
 
-  auto center_templates_repo =
-      "https://github.com/dethrandir23/community-templates";
+  auto center_templates_repo = Links::main_templates_repo();
 
   if (StringUtils::toLower(options.front()) == "template") {
     if (StringUtils::toLower(options.back()) == "center") {
@@ -288,6 +288,7 @@ int main(int argc, char **argv) {
       "locales");
   loc.init();
   loc.setLocale(LocaleUtils::getPreferredLocale(loc));
+  loc.setFallbackLocale("en");
 
   if (!loc.load()) {
     std::cerr << "Failed to load locale" << std::endl;
@@ -295,12 +296,7 @@ int main(int argc, char **argv) {
 
   auto templates_dir = FileUtils::get_templates_folder();
   std::vector<std::filesystem::path> template_directories = {
-      FileUtils::get_templates_folder().append("user"),
-      FileUtils::get_templates_folder().append("system"),
-      FileUtils::get_templates_folder().append("community-templates"),
-      FileUtils::get_templates_folder().append("remote"),
-
-  };
+      FileUtils::get_templates_folder()};
 
   try {
     auto results = cli.parse(argc, argv);
@@ -347,7 +343,8 @@ int main(int argc, char **argv) {
           return 1;
         }
         auto template_dir = std::vector<std::filesystem::path>{
-            FileUtils::get_templates_folder().append("remote").append(repo_name)};
+            FileUtils::get_templates_folder().append("remote").append(
+                repo_name)};
         return handleCreate(template_dir, repo_name, loc);
       }
       if (!ensureTemplateProvided(results, loc))

@@ -12,6 +12,7 @@
 
 class Project {
 private:
+  //!remove unnecessary variables
   std::string name;
   std::string version;
   std::string author;
