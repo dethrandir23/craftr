@@ -33,7 +33,7 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
-#include "links.hpp"
+#include "../include/links.hpp"
 #include <exception>
 #include <iostream>
 #include <ostream>
@@ -67,11 +67,11 @@ int handleValidate(
 
   std::filesystem::path templateToValidate;
   if (templates.size() > 1) {
-    std::cout << "Multiple templates with the same name found:\n";
+    std::cout << loc.getText("MULTIPLE_TEMPLATES_FOUND") << std::endl;
     for (size_t i = 0; i < templates.size(); ++i) {
       std::cout << i + 1 << ". " << templates[i] << "\n";
     }
-    std::cout << "Which one do you want to validate? [1-" << templates.size()
+    std::cout << loc.getText("WHICH_ONE_TO_VALIDATE") << " [1-" << templates.size()
               << "]: ";
     int choice;
     std::cin >> choice;
@@ -115,11 +115,11 @@ int handleCreate(
   }
   config.templatePath = templates.front();
   if (templates.size() > 1) {
-    std::cout << "Multiple templates found:\n";
+    std::cout << loc.getText("MULTIPLE_TEMPLATES_FOUND") << std::endl;
     for (size_t i = 0; i < templates.size(); ++i) {
       std::cout << i + 1 << ". " << templates[i] << "\n";
     }
-    std::cout << "Select one [1-" << templates.size() << "]: ";
+    std::cout << loc.getText("SELECT_ONE") << " [1-" << templates.size() << "]: ";
     int choice;
     std::cin >> choice;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -203,15 +203,15 @@ int handleLanguage(const std::string &newLocale, Localita &loc) {
   return 1;
 }
 
-int handlePull(const std::vector<std::string> &options) {
+int handlePull(const std::vector<std::string> &options, Localita &loc) {
   if (options.size() != 2) {
-    std::cerr << "Usage: craftr --pull <template/license> <remotelink/center>"
-              << std::endl;
+    std::cerr << 
+              loc.getText("PULL_USAGE") << std::endl;
     return 1;
   }
   if (!GitUtils::isGitInstalled()) {
     std::cerr
-        << "Git is not installed on your machine. Please install git first."
+        << loc.getText("GIT_IS_NOT_INSTALLED")
         << std::endl;
     return 1;
   }
@@ -223,11 +223,11 @@ int handlePull(const std::vector<std::string> &options) {
       if (!GitUtils::runGitCloneOrPull(center_templates_repo,
                                        FileUtils::get_templates_folder().append(
                                            "community-templates"))) {
-        std::cerr << "Something went wrong while downloading the templates."
+        std::cerr << loc.getText("SOMETHING_WENT_WRONG_WHILE_DOWNLOADING")
                   << std::endl;
         return 1;
       }
-      std::cout << "Successfully installed/updated community templates."
+      std::cout << loc.getText("SUCCESSFULLY_INSTALLED_COMMUNITY_TEMPLATES")
                 << std::endl;
       return 0;
     } else {
@@ -235,32 +235,32 @@ int handlePull(const std::vector<std::string> &options) {
       std::string repoName = GitUtils::getRepoNameFromUrl(repoUrl);
 
       if (repoName.empty()) {
-        std::cerr << "Invalid repository URL format: " << repoUrl << std::endl;
+        std::cerr << loc.getText("INVALID_REPO_URL") << ": " << repoUrl << std::endl;
         return 1;
       }
 
-      std::cout << "Repository name detected: " << repoName << std::endl;
-      std::cout << "Downloading into 'remote/" << repoName << "' directory..."
+      std::cout << loc.getText("REPOSITORY_NAME_DETECTED") << ": " << repoName << std::endl;
+      std::cout << loc.getText("DOWNLOADING_INTO_REMOTE") << repoName << loc.getText("DIRECTORY")
                 << std::endl;
 
       auto targetPath =
           FileUtils::get_templates_folder().append("remote").append(repoName);
 
       if (!GitUtils::runGitCloneOrPull(repoUrl, targetPath)) {
-        std::cerr << "Something went wrong while cloning/pulling from "
+        std::cerr << loc.getText("SOMETHING_WENT_WRONG_WHILE_PULLING")
                   << repoUrl << std::endl;
         return 1;
       }
 
-      std::cout << "Successfully installed/updated template from " << repoUrl
+      std::cout << loc.getText("SUCCESSFULLY_INSTALLED_TEMPLATE") << repoUrl
                 << std::endl;
       return 0;
       //-------------------------------------------------------------
     }
   } else if (StringUtils::toLower(options.front()) == "license") {
   } else {
-    std::cerr << "Please enter a valid option." << std::endl;
-    std::cerr << "Usage: craftr --pull <template/license> <remotelink/center>"
+    std::cerr << loc.getText("PLEASE_ENTER_A_VALID_OPTION") << std::endl;
+    std::cerr << loc.getText("PULL_USAGE")
               << std::endl;
     return 1;
   }
@@ -301,7 +301,7 @@ int main(int argc, char **argv) {
   try {
     auto results = cli.parse(argc, argv);
     if (results.find("pull") != results.end()) {
-      return handlePull(std::get<std::vector<std::string>>(results.at("pull")));
+      return handlePull(std::get<std::vector<std::string>>(results.at("pull")), loc);
     }
 
     if (results.find("language") != results.end()) {
@@ -320,7 +320,7 @@ int main(int argc, char **argv) {
     if (results.find("validate") != results.end()) {
       if (results.find("remote") != results.end()) {
         std::cerr
-            << "You can only validate local templates! Pull the template first."
+            << loc.getText("CAN_ONLY_VALIDATE_LOCAL_TEMPLATES")
             << std::endl;
         return 1;
       }
@@ -335,10 +335,10 @@ int main(int argc, char **argv) {
         auto link = std::get<std::string>(results.at("remote"));
         auto repo_name = GitUtils::getRepoNameFromUrl(link);
         try {
-          handlePull({"template", link});
+          handlePull({"template", link}, loc);
         } catch (const std::exception &e) {
           std::cerr << e.what() << std::endl;
-          std::cerr << "Something went wrong while pulling the template."
+          std::cerr << loc.getText("SOMETHING_WENT_WRONG_WHILE_PULLING_TEMPLATE")
                     << std::endl;
           return 1;
         }
