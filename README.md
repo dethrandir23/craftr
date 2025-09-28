@@ -214,6 +214,6 @@ This project is licensed under the MIT License. See the [LICENSE](https://www.go
 
 ## 🌐 Other Languages
 
-  - [Türkçe](https://www.google.com/search?q=docs/tr/README.md)
+  - [Türkçe](docs/tr/README.md)
 
 **Craftr** is made with ❤️ by [dethrandir23](https://github.com/dethrandir23).
