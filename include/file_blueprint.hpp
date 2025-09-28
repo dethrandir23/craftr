@@ -6,6 +6,7 @@
 struct FileBlueprint {
   std::filesystem::path template_path;
   std::filesystem::path target_path;
+  std::filesystem::path origin_path;
 
   FileBlueprint() = default;
 
