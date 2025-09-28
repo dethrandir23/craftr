@@ -22,9 +22,12 @@
 
 #include "../include/Cliopatra.hpp"
 #include "../include/config.hpp"
+#include "../include/extractor.hpp"
+#include "../include/file_blueprint.hpp"
 #include "../include/file_utils.hpp"
 #include "../include/git_utils.hpp"
 #include "../include/license_utils.hpp"
+#include "../include/links.hpp"
 #include "../include/locale_utils.hpp"
 #include "../include/metadata.hpp"
 #include "../include/output_utils.hpp"
@@ -33,8 +36,8 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
-#include "../include/links.hpp"
 #include <exception>
+#include <filesystem>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -71,8 +74,8 @@ int handleValidate(
     for (size_t i = 0; i < templates.size(); ++i) {
       std::cout << i + 1 << ". " << templates[i] << "\n";
     }
-    std::cout << loc.getText("WHICH_ONE_TO_VALIDATE") << " [1-" << templates.size()
-              << "]: ";
+    std::cout << loc.getText("WHICH_ONE_TO_VALIDATE") << " [1-"
+              << templates.size() << "]: ";
     int choice;
     std::cin >> choice;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -119,7 +122,8 @@ int handleCreate(
     for (size_t i = 0; i < templates.size(); ++i) {
       std::cout << i + 1 << ". " << templates[i] << "\n";
     }
-    std::cout << loc.getText("SELECT_ONE") << " [1-" << templates.size() << "]: ";
+    std::cout << loc.getText("SELECT_ONE") << " [1-" << templates.size()
+              << "]: ";
     int choice;
     std::cin >> choice;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -205,14 +209,11 @@ int handleLanguage(const std::string &newLocale, Localita &loc) {
 
 int handlePull(const std::vector<std::string> &options, Localita &loc) {
   if (options.size() != 2) {
-    std::cerr << 
-              loc.getText("PULL_USAGE") << std::endl;
+    std::cerr << loc.getText("PULL_USAGE") << std::endl;
     return 1;
   }
   if (!GitUtils::isGitInstalled()) {
-    std::cerr
-        << loc.getText("GIT_IS_NOT_INSTALLED")
-        << std::endl;
+    std::cerr << loc.getText("GIT_IS_NOT_INSTALLED") << std::endl;
     return 1;
   }
 
@@ -235,13 +236,15 @@ int handlePull(const std::vector<std::string> &options, Localita &loc) {
       std::string repoName = GitUtils::getRepoNameFromUrl(repoUrl);
 
       if (repoName.empty()) {
-        std::cerr << loc.getText("INVALID_REPO_URL") << ": " << repoUrl << std::endl;
+        std::cerr << loc.getText("INVALID_REPO_URL") << ": " << repoUrl
+                  << std::endl;
         return 1;
       }
 
-      std::cout << loc.getText("REPOSITORY_NAME_DETECTED") << ": " << repoName << std::endl;
-      std::cout << loc.getText("DOWNLOADING_INTO_REMOTE") << repoName << loc.getText("DIRECTORY")
+      std::cout << loc.getText("REPOSITORY_NAME_DETECTED") << ": " << repoName
                 << std::endl;
+      std::cout << loc.getText("DOWNLOADING_INTO_REMOTE") << repoName
+                << loc.getText("DIRECTORY") << std::endl;
 
       auto targetPath =
           FileUtils::get_templates_folder().append("remote").append(repoName);
@@ -260,11 +263,84 @@ int handlePull(const std::vector<std::string> &options, Localita &loc) {
   } else if (StringUtils::toLower(options.front()) == "license") {
   } else {
     std::cerr << loc.getText("PLEASE_ENTER_A_VALID_OPTION") << std::endl;
-    std::cerr << loc.getText("PULL_USAGE")
-              << std::endl;
+    std::cerr << loc.getText("PULL_USAGE") << std::endl;
     return 1;
   }
   return 1;
+}
+
+int handleExtract(const std::string &directory, Localita &loc) {
+  std::filesystem::path sourcePath(directory);
+  if (!std::filesystem::exists(sourcePath) ||
+      !std::filesystem::is_directory(sourcePath)) {
+    std::cerr << "[" << loc.getText("ERROR") << "] "
+              << loc.getText("INVALID_SOURCE_DIRECTORY") << ": " << directory
+              << std::endl;
+    return 1;
+  }
+
+  std::cout << loc.getText("CREATING_TEMPLATE_FROM") << directory << std::endl;
+
+  std::string name, version, author, description;
+
+  std::cout << loc.getText("EXTRACT_PROMPT_NAME");
+  std::getline(std::cin, name);
+  if (StringUtils::trim(name).empty()) {
+    std::cerr << "[" << loc.getText("ERROR") << "] "
+              << loc.getText("TEMPLATE_NAME_CANNOT_BE_EMPTY") << std::endl;
+    return 1;
+  }
+
+  std::cout << loc.getText("EXTRACT_PROMPT_VERSION");
+  std::getline(std::cin, version);
+  if (StringUtils::trim(version).empty()) {
+    version = "1.0";
+  }
+
+  std::cout << loc.getText("EXTRACT_PROMPT_AUTHOR");
+  std::getline(std::cin, author);
+
+  std::cout << loc.getText("EXTRACT_PROMPT_DESCRIPTION");
+  std::getline(std::cin, description);
+
+  CommandUtils::CommandMode cm = CommandUtils::CommandMode::Cautious;
+  bool sm = false;
+
+  std::cout << loc.getText("EXTRACT_PROMPT_COMMAND_MODE") << std::endl;
+  std::cout << loc.getText("OPT_CAUTIOUS") << std::endl;
+  std::cout << loc.getText("OPT_EXECUTE_ALL") << std::endl;
+  std::cout << loc.getText("SELECT_ONE") << "[1-2]: ";
+  int choice;
+  std::cin >> choice;
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  if (choice == 2) {
+    cm = CommandUtils::CommandMode::ExecuteAll;
+  }
+
+  std::cout << loc.getText("EXTRACT_PROMPT_SILENT_MODE");
+  char silent_choice;
+  std::cin >> silent_choice;
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  if (silent_choice == 'e' || silent_choice == 'E') {
+    sm = true;
+  }
+
+  YAML::Node root;
+  std::cout << loc.getText("EXTRACT_PROCESSING") << std::endl;
+
+  bool success = Extractor::ExtractTemplate(sourcePath, root, name, version,
+                                            author, description, cm, sm);
+
+  if (success) {
+    std::cout << "[" << loc.getText("SUCCESS") << "] "
+              << loc.getText("TEMPLATE_EXTRACTED_SUCCESSFULLY") << name
+              << std::endl;
+    return 0;
+  } else {
+    std::cerr << "[" << loc.getText("ERROR") << "] "
+              << loc.getText("TEMPLATE_EXTRACTION_FAILED") << std::endl;
+    return 1;
+  }
 }
 // ---------------- Main ----------------
 
@@ -281,6 +357,7 @@ int main(int argc, char **argv) {
   cli.addOption("l", "language", Cliopatra::Option::string_o);
   cli.addOption("p", "pull", Cliopatra::Option::multi_string_o);
   cli.addOption("r", "remote", Cliopatra::Option::string_o);
+  cli.addOption("e", "extract", Cliopatra::Option::string_o);
 
   Localita loc;
   loc.setLocalePath(
@@ -300,8 +377,12 @@ int main(int argc, char **argv) {
 
   try {
     auto results = cli.parse(argc, argv);
+    if (results.find("extract") != results.end()) {
+      return handleExtract(std::get<std::string>(results.at("extract")), loc);
+    }
     if (results.find("pull") != results.end()) {
-      return handlePull(std::get<std::vector<std::string>>(results.at("pull")), loc);
+      return handlePull(std::get<std::vector<std::string>>(results.at("pull")),
+                        loc);
     }
 
     if (results.find("language") != results.end()) {
@@ -319,9 +400,8 @@ int main(int argc, char **argv) {
     //! update
     if (results.find("validate") != results.end()) {
       if (results.find("remote") != results.end()) {
-        std::cerr
-            << loc.getText("CAN_ONLY_VALIDATE_LOCAL_TEMPLATES")
-            << std::endl;
+        std::cerr << loc.getText("CAN_ONLY_VALIDATE_LOCAL_TEMPLATES")
+                  << std::endl;
         return 1;
       }
       if (!ensureTemplateProvided(results, loc))
@@ -338,7 +418,8 @@ int main(int argc, char **argv) {
           handlePull({"template", link}, loc);
         } catch (const std::exception &e) {
           std::cerr << e.what() << std::endl;
-          std::cerr << loc.getText("SOMETHING_WENT_WRONG_WHILE_PULLING_TEMPLATE")
+          std::cerr << loc.getText(
+                           "SOMETHING_WENT_WRONG_WHILE_PULLING_TEMPLATE")
                     << std::endl;
           return 1;
         }
