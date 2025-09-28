@@ -201,7 +201,7 @@ We welcome contributions\! Please feel free to submit issues, feature requests, 
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+This project is licensed under the **GPL License**. See the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 

@@ -203,7 +203,7 @@ Katkılarınızı bekliyoruz! Hata bildirimi, özellik isteği veya pull request
 
 ## 📄 Lisans
 
-Bu proje **MIT Lisansı** ile lisanslanmıştır. Ayrıntılar için [LICENSE](https://www.google.com/search?q=LICENSE) dosyasına bakın.
+Bu proje **GPL Lisansı** ile lisanslanmıştır. Ayrıntılar için [LICENSE](LICENSE) dosyasına bakın.
 
 ## 🙏 Teşekkürler
 
