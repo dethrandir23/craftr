@@ -22,10 +22,10 @@ else()
     target_compile_options(craftr PRIVATE -Wall -Wextra -pedantic -Wshadow)
 endif()
 
-# YAML lib
-find_package(yaml-cpp REQUIRED)
-target_link_libraries(craftr PRIVATE yaml-cpp)
+set(YAML_CPP_BUILD_TESTS OFF)
+set(YAML_CPP_BUILD_CONTRIB OFF)
+add_subdirectory(libs/yaml-cpp)
 
-# Submodule/library
 add_subdirectory(libs/localita)
-target_link_libraries(craftr PRIVATE localita)
+
+target_link_libraries(craftr PRIVATE yaml-cpp localita)
