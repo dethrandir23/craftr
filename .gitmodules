@@ -1,3 +1,6 @@
 [submodule "libs/localita"]
 	path = libs/localita
 	url = https://github.com/dethrandir23/localita.git
+[submodule "libs/yaml-cpp"]
+	path = libs/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
