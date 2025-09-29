@@ -198,50 +198,47 @@ commands:
 `craftr --help` komutunu çalıştırarak tüm kullanılabilir komutları görebilirsin:
 bash
 
-```
-┌─ Craftr CLI Yardım ────────────────────────
-│ Craftr, şablonlar kullanarak projeler oluşturmanı ve yönetmeni sağlayan bir araçtır.
-│ 
-│ Kullanım:
-│   craftr [SEÇENEKLER] [KOMUT]
-│ 
-│ Temel Komutlar:
-│   -h, --help              Yardımı göster ve çık
-│   -v, --version           Sürüm bilgisini göster ve çık
-│   -l, --language <locale> Dili değiştir (örn: 'tr', 'en', 'system')
-│ 
-│ Proje Oluşturma:
-│   -c, --create            Yeni bir proje oluştur
-│   -t, --template <isim>   Kullanılacak şablonu belirt
-│   -f, --find              Şablonları ara ve etkileşimli olarak oluştur
-│   -n, --name <isim>       find komutu için proje adını belirt
-│ 
-│ Şablon Yönetimi:
-│   -li, --list [kategori]  Mevcut şablonları listele (kategoriler: all, user, center, remote, system)
-│   -p, --pull <tip> <kaynak> Şablon veya lisans indir (örn: 'template center', 'template <url>')
-│   -e, --extract <klasör>  Mevcut bir projeden şablon oluştur
-│   -va, --validate          Şablon doğruluğunu kontrol et
-│   -r, --remote <url>      Git deposundan uzak şablon kullan
-│ 
-│ Gelişmiş Komutlar:
-│   -a, --add <modül>       Projeye modül veya bileşen ekle
-│   -b, --build <hedef>     Projeyi derle (şablon destekliyorsa)
-│   -co, --config <anahtar=değer> Yapılandırma seçeneklerini ayarla
-│ 
-│ Örnekler:
-│   # Yeni bir C++ projesi oluştur
-│   craftr --create --template cpp
-│   # Şablon ara ve oluştur
-│   craftr --find --name cpp
-│   # Tüm şablonları listele
-│   craftr --list
-│   # Topluluk şablonlarını indir
-│   craftr --pull template center
-│   # Dili Türkçe yap
-│   craftr --language tr
-│ 
-│ Daha fazla bilgi için dokümantasyona bakabilirsin.
-└──────────────────────────────────────────
+| Komut                     | Açıklama                      |
+| ------------------------- | ----------------------------- |
+| `-h, --help`              | Yardımı göster ve çık         |
+| `-v, --version`           | Sürüm bilgisini göster ve çık |
+| `-l, --language <locale>` | Arayüz dilini değiştir        |
+
+### Proje Oluşturma
+
+| Komut                   | Açıklama                            |
+| ----------------------- | ----------------------------------- |
+| `-c, --create`          | Yeni proje oluştur                  |
+| `-t, --template <isim>` | Belirli bir şablon kullan           |
+| `-f, --find`            | Şablonları etkileşimli olarak ara   |
+| `-n, --name <isim>`     | find komutu için proje adını belirt |
+
+### Şablon Yönetimi
+
+| Komut                       | Açıklama                                               |
+| --------------------------- | ------------------------------------------------------ |
+| `-li, --list [kategori]`    | Şablonları listele (all, user, center, remote, system) |
+| `-p, --pull <tip> <kaynak>` | Şablon veya lisans indir                               |
+| `-e, --extract <klasör>`    | Mevcut bir projeden şablon oluştur                     |
+| `-va, --validate`           | Şablonu doğrula                                        |
+| `-r, --remote <url>`        | Git üzerinden uzak şablon kullan                       |
+
+### Gelişmiş Komutlar
+
+| Komut                           | Açıklama                             |
+| ------------------------------- | ------------------------------------ |
+| `-a, --add <modül>`             | Projeye modül veya bileşen ekle      |
+| `-b, --build <hedef>`           | Projeyi derle (şablon destekliyorsa) |
+| `-co, --config <anahtar=değer>` | Yapılandırma seçeneklerini ayarla    |
+
+### Örnekler
+
+```bash
+craftr --create --template cpp
+craftr --find --name cpp
+craftr --list
+craftr --pull template center
+craftr --language tr
 ```
 
 ### Detaylı Komut Örnekleri

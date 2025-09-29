@@ -199,48 +199,50 @@ commands:
 Run craftr --help to see all available commands:
 bash
 
-┌─ Craftr CLI Help ────────────────────────
-│ Craftr is a tool for creating and managing projects using templates.
-│ 
-│ Usage:
-│   craftr [OPTIONS] [COMMAND]
-│ 
-│ Basic Commands:
-│   -h, --help              Show this help message and exit.
-│   -v, --version           Show version information and exit.
-│   -l, --language <locale> Change the language (e.g., 'tr', 'en', 'system').
-│ 
-│ Project Creation:
-│   -c, --create            Create a new project from a template.
-│   -t, --template <name>   Specify the template to use.
-│   -f, --find              Search for templates and create project interactively.
-│   -n, --name <name>       Specify the project name for find command.
-│ 
-│ Template Management:
-│   -li, --list [category]   List available templates (categories: all, user, center, remote, system).
-│   -p, --pull <type> <source> Download templates or licenses (e.g., 'template center', 'template <url>').
-│   -e, --extract <directory> Create a template from an existing project directory.
-│   -va, --validate          Validate a template for correctness.
-│   -r, --remote <url>      Use a remote template from a Git repository.
-│ 
-│ Advanced Commands:
-│   -a, --add <module>      Add a module or component to the project.
-│   -b, --build <target>    Build the project (if supported by template).
-│   -co, --config <key=value> Set configuration options.
-│ 
-│ Examples:
-│   # Create a new C++ project
-│   craftr --create --template cpp
-│   # Search for a template and create
-│   craftr --find --name cpp
-│   # List all templates
-│   craftr --list
-│   # Pull community templates
-│   craftr --pull template center
-│   # Change language to Turkish
-│   craftr --language tr
-│ 
-│ For more information, visit the documentation.
+### Basic Commands
+
+| Command | Description |
+|---------|-------------|
+| `-h, --help` | Show help and exit |
+| `-v, --version` | Show version and exit |
+| `-l, --language <locale>` | Change UI language |
+
+### Project Creation
+
+| Command | Description |
+|---------|-------------|
+| `-c, --create` | Create new project |
+| `-t, --template <name>` | Use specific template |
+| `-f, --find` | Search templates interactively |
+| `-n, --name <name>` | Specify project name for find |
+
+### Template Management
+
+| Command | Description |
+|---------|-------------|
+| `-li, --list [category]` | List templates (all, user, center, remote, system) |
+| `-p, --pull <type> <source>` | Download templates or licenses |
+| `-e, --extract <directory>` | Create template from existing project |
+| `-va, --validate` | Validate a template |
+| `-r, --remote <url>` | Use remote template from Git |
+
+### Advanced Commands
+
+| Command | Description |
+|---------|-------------|
+| `-a, --add <module>` | Add module/component to project |
+| `-b, --build <target>` | Build project (template-dependent) |
+| `-co, --config <key=value>` | Set configuration options |
+
+### Examples
+
+```bash
+craftr --create --template cpp
+craftr --find --name cpp
+craftr --list
+craftr --pull template center
+craftr --language en
+```
 └──────────────────────────────────────────
 
 Detailed Command Examples
