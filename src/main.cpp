@@ -42,8 +42,6 @@
 #include <string>
 #include <vector>
 
-// ---------------- Helper Functions ----------------
-
 bool ensureTemplateProvided(const Cliopatra::ParsedMap &results,
                             Localita &loc) {
   if (results.find("template") == results.end()) {
@@ -456,7 +454,153 @@ int handleList(const std::string &dir, Localita &loc) {
   return 0;
 }
 
-int handleFind(const std::string &name, Localita &loc) { return 0; }
+int handleCreateWithPath(const std::filesystem::path &templatePath, Localita &loc) {
+    Config config;
+    config.templatePath = templatePath;
+
+    auto metadata = TemplateUtils::GetTemplateMetadata(templatePath);
+    if (metadata) {
+        std::cout << std::endl;
+        std::cout << Colors::BOLD << Colors::GREEN << "Selected: " << metadata->name;
+        if (!metadata->version.empty()) {
+            std::cout << Colors::MAGENTA << " v" << metadata->version;
+        }
+        std::cout << Colors::RESET << std::endl;
+        
+        if (!metadata->description.empty()) {
+            std::cout << Colors::WHITE << metadata->description << Colors::RESET << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    for (auto key : TemplateUtils::GetTemplateReplacerTypes(config.templatePath)) {
+        if (key == "DATE") {
+            config.variables[key] = DateUtils::GetCurrentYearStr();
+            continue;
+        }
+        std::string input;
+        std::cout << Colors::CYAN << loc.getText("ENTER") << key << ": " << Colors::RESET;
+        std::getline(std::cin, input);
+        config.variables[key] = input;
+        if (key == "PROJECT_NAME") {
+            config.name = StringUtils::trim(input);
+        }
+    }
+
+    std::cout << std::endl;
+    std::cout << Colors::BOLD << Colors::CYAN << loc.getText("LICENSE_TYPE_SELECTION") << Colors::RESET << std::endl;
+    for (auto l : LicenseUtils::GetLicenseTypes()) {
+        std::cout << "- " << l << "\n";
+    }
+    std::cout << Colors::CYAN << loc.getText("SELECTED_LICENSE") << Colors::RESET;
+    std::string input;
+    std::getline(std::cin, input);
+    config.license = StringUtils::trim(input).empty() ? "none" : StringUtils::trim(input);
+
+    std::cout << std::endl;
+    std::cout << Colors::BOLD << Colors::GREEN << "Creating project..." << Colors::RESET << std::endl;
+    
+    return ProjectUtils::create_project(config, loc) ? 0 : 1;
+}
+
+int handleFind(const std::string &name, Localita &loc) {
+    std::filesystem::path base_path = FileUtils::get_templates_folder();
+    std::vector<std::filesystem::path> templates_directories = {
+        base_path / "user",
+        base_path / "community-templates", 
+        base_path / "remote",
+        base_path / "system"
+    };
+
+    auto templates = TemplateUtils::FindTemplatesByName(templates_directories, name);
+
+    // Header
+    std::cout << Colors::BOLD << Colors::CYAN 
+              << "┌─ " << loc.getText("FIND_HEADER") 
+              << " ────────────────────────" << Colors::RESET << std::endl;
+    
+    std::cout << Colors::BOLD << Colors::CYAN << "│ " << Colors::RESET
+              << templates.size() << " " << loc.getText("FOUND_TEMPLATES_FOR") 
+              << " \"" << name << "\"" << std::endl;
+    
+    std::cout << Colors::BOLD << Colors::CYAN << "└──────────────────────────────────────────" 
+              << Colors::RESET << std::endl;
+
+    if (templates.empty()) {
+        std::cout << "  " << Colors::YELLOW << loc.getText("FIND_NO_RESULTS") 
+                  << " \"" << name << "\"" << Colors::RESET << std::endl;
+        return 1;
+    }
+
+    for (size_t i = 0; i < templates.size(); ++i) {
+        std::cout << std::endl;
+        
+        std::cout << Colors::BOLD << Colors::YELLOW << "  " << (i + 1) << ". " << Colors::RESET;
+        
+        auto metadata = TemplateUtils::GetTemplateMetadata(templates[i]);
+        if (metadata) {
+            std::cout << Colors::BOLD << Colors::GREEN << metadata->name;
+            if (!metadata->version.empty()) {
+                std::cout << Colors::MAGENTA << " v" << metadata->version;
+            }
+            std::cout << Colors::RESET << std::endl;
+            
+            if (!metadata->description.empty()) {
+                std::cout << "     " << Colors::WHITE << metadata->description 
+                          << Colors::RESET << std::endl;
+            }
+            
+            std::cout << "     " << Colors::CYAN << loc.getText("LIST_TEMPLATE_AUTHOR") 
+                      << ": " << Colors::RESET;
+            if (!metadata->author.empty()) {
+                std::cout << metadata->author;
+            } else {
+                std::cout << Colors::YELLOW << loc.getText("LIST_UNKNOWN_AUTHOR") 
+                          << Colors::RESET;
+            }
+            
+            std::string category = "Unknown";
+            std::string path_str = templates[i].string();
+            if (path_str.find("user") != std::string::npos) category = "User";
+            else if (path_str.find("community-templates") != std::string::npos) category = "Community";
+            else if (path_str.find("remote") != std::string::npos) category = "Remote";
+            else if (path_str.find("system") != std::string::npos) category = "System";
+            
+            std::cout << "   " << Colors::BLUE << "Category: " << Colors::RESET 
+                      << category << std::endl;
+            
+        } else {
+            std::cout << Colors::BOLD << Colors::GREEN << templates[i].stem().string() 
+                      << Colors::RESET << std::endl;
+        }
+        
+        std::cout << "     " << Colors::BLUE << loc.getText("LIST_TEMPLATE_PATH") << ": " 
+                  << Colors::RESET << templates[i].string() << std::endl;
+    }
+
+    std::cout << std::endl;
+    std::cout << Colors::BOLD << Colors::CYAN 
+              << loc.getText("FIND_SELECT_PROMPT").replace(loc.getText("FIND_SELECT_PROMPT").find("{count}"), 7, std::to_string(templates.size()))
+              << Colors::RESET;
+    
+    int choice;
+    std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (choice == 0) {
+        std::cout << Colors::YELLOW << loc.getText("FIND_CANCELLED") << Colors::RESET << std::endl;
+        return 0;
+    }
+
+    if (choice < 1 || choice > static_cast<int>(templates.size())) {
+        std::cerr << Colors::RED << loc.getText("FIND_INVALID_SELECTION") << Colors::RESET << std::endl;
+        return 1;
+    }
+
+    std::filesystem::path selected_template = templates[choice - 1];
+    
+    return handleCreateWithPath(selected_template, loc);
+}
 
 // ---------------- Main ----------------
 
@@ -468,15 +612,15 @@ int main(int argc, char **argv) {
   cli.addOption("a", "add", Cliopatra::Option::string_o);
   cli.addOption("b", "build", Cliopatra::Option::string_o);
   cli.addOption("co", "config", Cliopatra::Option::string_o);
-  cli.addOption("v", "validate", Cliopatra::Option::bool_o);
+  cli.addOption("va", "validate", Cliopatra::Option::bool_o);
   cli.addOption("t", "template", Cliopatra::Option::string_o);
   cli.addOption("l", "language", Cliopatra::Option::string_o);
   cli.addOption("p", "pull", Cliopatra::Option::multi_string_o);
   cli.addOption("r", "remote", Cliopatra::Option::string_o);
   cli.addOption("e", "extract", Cliopatra::Option::string_o);
-  cli.addOption("l", "list", Cliopatra::Option::bool_o);
+  cli.addOption("li", "list", Cliopatra::Option::bool_o);
   cli.addOption("n", "name", Cliopatra::Option::string_o);
-  cli.addOption("f", "find", Cliopatra::Option::string_o);
+  cli.addOption("f", "find", Cliopatra::Option::bool_o);
 
   Localita loc;
   loc.setLocalePath(
@@ -498,10 +642,10 @@ int main(int argc, char **argv) {
     auto results = cli.parse(argc, argv);
 
     if (results.find("find") != results.end()) {
-      if (results.find("name") != results.end()) {
+      if (results.find("name") == results.end()) {
         std::cerr << loc.getText("NAME_NOT_ENTERED") << std::endl;
       } else {
-
+        handleFind(std::get<std::string>(results.at("name")), loc);
       }
     }
 
