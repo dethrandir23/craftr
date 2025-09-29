@@ -670,11 +670,11 @@ int main(int argc, char **argv) {
     }
 
     if (results.find("help") != results.end()) {
-      OutputUtils::print_help();
+      OutputUtils::print_help(loc);
       return 0;
     }
     if (results.find("version") != results.end()) {
-      OutputUtils::print_version();
+      OutputUtils::print_version(loc);
       return 0;
     }
     //! update
