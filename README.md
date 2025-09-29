@@ -2,6 +2,8 @@
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![CMake Version](https://img.shields.io/badge/CMake-3.15%2B-064F8C.svg)](https://cmake.org/)
 [![Platform Support](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-blue.svg)](https://github.com/dethrandir23/craftr)
+[![CLI Tool](https://img.shields.io/badge/CLI-Tool-green.svg)](https://github.com/dethrandir23/craftr)
+[![Template Engine](https://img.shields.io/badge/Template-YAML-red.svg)](https://github.com/dethrandir23/craftr)
 
 -----
 
@@ -18,14 +20,15 @@ While it was born as a C++ project creator, its **YAML-based template engine** n
 
 ## ✨ Features
 
-  - **Template-Driven:** Define your own project structures with YAML.
-  - **Interactive Setup:** `craftr` prompts you for variables, so you don't have to memorize long commands.
-  - **Post-Creation Hooks:** Automatically run shell commands (like `git init` or `npm install`) after project creation.
-  - **Template Validation:** Ensure your templates are well-formed and ready to use with the `--validate` command.
-  - **🌐 Remote Templates:** Pull templates from Git repositories or a central community hub, or use them directly without a local clone.
-  - **🧙‍♂️ Template From Directory:** Instantly turn any existing project directory into a reusable Craftr template.
-  - **🌍 Localization:** A user-friendly experience with support for multiple languages (EN, TR).
-  - **Cross-Platform:** Designed to work seamlessly on Linux, macOS, and Windows.
+- **🔄 Template-Driven:** Define your own project structures with YAML
+- **🔍 Interactive Discovery:** Search and browse templates with `--find` and `--list`
+- **🌐 Remote Templates:** Pull templates from Git repos or community hub
+- **🛠️ Template Extraction:** Convert existing projects to templates with `--extract`
+- **✅ Template Validation:** Ensure template quality with `--validate`
+- **🌍 Multi-language UI:** **Multi-language UI:** 15 languages supported - English, Turkish, Spanish, French, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean, Arabic, Hindi, Dutch, Polish
+- **⚡ Post-Creation Hooks:** Automate setup commands (git init, npm install, etc.)
+- **📦 Cross-Platform:** Works on Linux, macOS, and Windows
+- **🎨 Colorful CLI:** Beautiful, color-coded output for better UX
 
 ## 📦 Installation
 
@@ -188,6 +191,102 @@ commands:
   - command: "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
     description: "Creating first commit..."
 ```
+
+## 🎯 Command Reference
+
+### Quick Help Output
+
+Run craftr --help to see all available commands:
+bash
+
+┌─ Craftr CLI Help ────────────────────────
+│ Craftr is a tool for creating and managing projects using templates.
+│ 
+│ Usage:
+│   craftr [OPTIONS] [COMMAND]
+│ 
+│ Basic Commands:
+│   -h, --help              Show this help message and exit.
+│   -v, --version           Show version information and exit.
+│   -l, --language <locale> Change the language (e.g., 'tr', 'en', 'system').
+│ 
+│ Project Creation:
+│   -c, --create            Create a new project from a template.
+│   -t, --template <name>   Specify the template to use.
+│   -f, --find              Search for templates and create project interactively.
+│   -n, --name <name>       Specify the project name for find command.
+│ 
+│ Template Management:
+│   -li, --list [category]   List available templates (categories: all, user, center, remote, system).
+│   -p, --pull <type> <source> Download templates or licenses (e.g., 'template center', 'template <url>').
+│   -e, --extract <directory> Create a template from an existing project directory.
+│   -va, --validate          Validate a template for correctness.
+│   -r, --remote <url>      Use a remote template from a Git repository.
+│ 
+│ Advanced Commands:
+│   -a, --add <module>      Add a module or component to the project.
+│   -b, --build <target>    Build the project (if supported by template).
+│   -co, --config <key=value> Set configuration options.
+│ 
+│ Examples:
+│   # Create a new C++ project
+│   craftr --create --template cpp
+│   # Search for a template and create
+│   craftr --find --name cpp
+│   # List all templates
+│   craftr --list
+│   # Pull community templates
+│   craftr --pull template center
+│   # Change language to Turkish
+│   craftr --language tr
+│ 
+│ For more information, visit the documentation.
+└──────────────────────────────────────────
+
+Detailed Command Examples
+🔍 Finding and Creating Projects
+bash
+
+### Interactive template search and creation
+craftr --find --name cpp
+
+### Create with specific template
+craftr --create --template cpp
+
+### Use remote template directly
+craftr --create --remote https://github.com/user/template-repo
+
+📁 Template Management
+bash
+
+### List all templates
+craftr --list
+
+### List specific categories
+craftr --list user
+craftr --list center  
+craftr --list remote
+
+### Download templates
+craftr --pull template center
+craftr --pull template https://github.com/user/template-repo
+
+### Validate template
+craftr --validate --template cpp
+
+### Create template from existing project
+craftr --extract ./my-project
+
+⚙️ Configuration
+bash
+
+### Change language
+craftr --language tr
+craftr --language en
+craftr --language system
+
+### Show version
+craftr --version
 
 ## 🤝 Contributing
 

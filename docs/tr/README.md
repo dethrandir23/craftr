@@ -24,7 +24,7 @@ Başlangıçta bir C++ proje oluşturucu olarak ortaya çıkmış olsa da, **YAM
 * **Şablon Doğrulama:** `--validate` komutuyla şablonlarınızın hatasız ve kullanıma hazır olduğundan emin olun.
 * **🌐 Uzak Şablonlar:** Git depolarından veya merkezi bir topluluk havuzundan şablonları çekin, hatta doğrudan uzak şablonlarla çalışın.
 * **🧙‍♂️ Klasörden Şablon:** Var olan herhangi bir proje dizinini anında Craftr şablonuna dönüştürün.
-* **🌍 Çok Dilli Destek:** İngilizce ve Türkçe dahil birden fazla dilde kullanıcı dostu deneyim.
+* **🌍 Çok Dilli Destek:** 15 dil desteği - İngilizce, Türkçe, İspanyolca, Fransızca, Almanca, İtalyanca, Portekizce, Rusça, Çince, Japonca, Korece, Arapça, Hintçe, Felemenkçe, Lehçe
 * **Çapraz Platform:** Linux, macOS ve Windows üzerinde sorunsuz çalışacak şekilde tasarlanmıştır.
 
 ## 📦 Kurulum
@@ -191,6 +191,114 @@ commands:
     description: "İlk commit oluşturuluyor..."
 ```
 
+## 🎯 Komut Referansı
+
+### Hızlı Yardım Çıktısı
+
+`craftr --help` komutunu çalıştırarak tüm kullanılabilir komutları görebilirsin:
+bash
+
+```
+┌─ Craftr CLI Yardım ────────────────────────
+│ Craftr, şablonlar kullanarak projeler oluşturmanı ve yönetmeni sağlayan bir araçtır.
+│ 
+│ Kullanım:
+│   craftr [SEÇENEKLER] [KOMUT]
+│ 
+│ Temel Komutlar:
+│   -h, --help              Yardımı göster ve çık
+│   -v, --version           Sürüm bilgisini göster ve çık
+│   -l, --language <locale> Dili değiştir (örn: 'tr', 'en', 'system')
+│ 
+│ Proje Oluşturma:
+│   -c, --create            Yeni bir proje oluştur
+│   -t, --template <isim>   Kullanılacak şablonu belirt
+│   -f, --find              Şablonları ara ve etkileşimli olarak oluştur
+│   -n, --name <isim>       find komutu için proje adını belirt
+│ 
+│ Şablon Yönetimi:
+│   -li, --list [kategori]  Mevcut şablonları listele (kategoriler: all, user, center, remote, system)
+│   -p, --pull <tip> <kaynak> Şablon veya lisans indir (örn: 'template center', 'template <url>')
+│   -e, --extract <klasör>  Mevcut bir projeden şablon oluştur
+│   -va, --validate          Şablon doğruluğunu kontrol et
+│   -r, --remote <url>      Git deposundan uzak şablon kullan
+│ 
+│ Gelişmiş Komutlar:
+│   -a, --add <modül>       Projeye modül veya bileşen ekle
+│   -b, --build <hedef>     Projeyi derle (şablon destekliyorsa)
+│   -co, --config <anahtar=değer> Yapılandırma seçeneklerini ayarla
+│ 
+│ Örnekler:
+│   # Yeni bir C++ projesi oluştur
+│   craftr --create --template cpp
+│   # Şablon ara ve oluştur
+│   craftr --find --name cpp
+│   # Tüm şablonları listele
+│   craftr --list
+│   # Topluluk şablonlarını indir
+│   craftr --pull template center
+│   # Dili Türkçe yap
+│   craftr --language tr
+│ 
+│ Daha fazla bilgi için dokümantasyona bakabilirsin.
+└──────────────────────────────────────────
+```
+
+### Detaylı Komut Örnekleri
+
+🔍 **Projeleri Bul ve Oluştur**
+
+bash
+
+```
+### Etkileşimli şablon arama ve oluşturma
+craftr --find --name cpp
+
+### Belirli şablon ile oluştur
+craftr --create --template cpp
+
+### Uzak şablonu doğrudan kullan
+craftr --create --remote https://github.com/user/template-repo
+```
+
+📁 **Şablon Yönetimi**
+
+bash
+
+```
+### Tüm şablonları listele
+craftr --list
+
+### Belirli kategoriyi listele
+craftr --list user
+craftr --list center
+craftr --list remote
+
+### Şablon indir
+craftr --pull template center
+craftr --pull template https://github.com/user/template-repo
+
+### Şablonu doğrula
+craftr --validate --template cpp
+
+### Mevcut projeden şablon oluştur
+craftr --extract ./my-project
+```
+
+⚙️ **Yapılandırma**
+
+bash
+
+```
+### Dili değiştir
+craftr --language tr
+craftr --language en
+craftr --language system
+
+### Sürümü göster
+craftr --version
+```
+
 ## 🤝 Katkıda Bulunma
 
 Katkılarınızı bekliyoruz! Hata bildirimi, özellik isteği veya pull request gönderebilirsiniz.
@@ -203,7 +311,7 @@ Katkılarınızı bekliyoruz! Hata bildirimi, özellik isteği veya pull request
 
 ## 📄 Lisans
 
-Bu proje **GPL Lisansı** ile lisanslanmıştır. Ayrıntılar için [LICENSE](LICENSE) dosyasına bakın.
+Bu proje **GPL Lisansı** ile lisanslanmıştır. Ayrıntılar için [LICENSE](../../LICENSE) dosyasına bakın.
 
 ## 🙏 Teşekkürler
 
