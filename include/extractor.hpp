@@ -13,8 +13,7 @@ bool ExtractFiles(const std::filesystem::path &directory,
 bool ExtractSubfolders(const std::filesystem::path &path,
                        std::vector<std::filesystem::path> &sf);
 
-bool CopyFileTemplates(const std::filesystem::path &src,
-                       const std::filesystem::path &dst,
+bool CopyFileTemplates(const std::filesystem::path &dst,
                        const std::vector<FileBlueprint> &fbp);
 
 bool AddFiles(YAML::Node &root, const std::vector<FileBlueprint> &fbp);

@@ -67,8 +67,7 @@ bool ExtractSubfolders(const std::filesystem::path &path,
   return true;
 }
 
-bool CopyFileTemplates(const std::filesystem::path &src,
-                       const std::filesystem::path &dst,
+bool CopyFileTemplates(const std::filesystem::path &dst,
                        const std::vector<FileBlueprint> &fbp) {
   try {
     for (const auto &entry : fbp) {
@@ -142,7 +141,7 @@ bool AddDefaultVariables(YAML::Node &root) {
     variablesNode["PROJECT_NAME"] = "{{PROJECT_NAME}}";
     variablesNode["AUTHOR_NAME"] = "{{AUTHOR_NAME}}";
     variablesNode["DATE"] = "{{DATE}}";
-    
+
     root["variables"] = variablesNode;
   } catch (const std::exception &e) {
     std::cout << "YAML AddDefaultVariables error: " << e.what() << std::endl;
@@ -238,7 +237,7 @@ bool ExtractTemplate(const std::filesystem::path &path, YAML::Node &root,
     auto file_dest = dest / "files";
     std::filesystem::create_directories(file_dest);
 
-    if (!CopyFileTemplates(path, file_dest, fbp)) {
+    if (!CopyFileTemplates(file_dest, fbp)) {
       std::cerr << "Failed to copy file templates." << std::endl;
       return false;
     }
