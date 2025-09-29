@@ -23,7 +23,6 @@
 #include "../include/Cliopatra.hpp"
 #include "../include/config.hpp"
 #include "../include/extractor.hpp"
-#include "../include/file_blueprint.hpp"
 #include "../include/file_utils.hpp"
 #include "../include/git_utils.hpp"
 #include "../include/license_utils.hpp"
@@ -342,6 +341,123 @@ int handleExtract(const std::string &directory, Localita &loc) {
     return 1;
   }
 }
+
+int handleList(const std::string &dir, Localita &loc) {
+  std::filesystem::path path = FileUtils::get_templates_folder();
+
+  auto selected_path = StringUtils::toLower(StringUtils::trim(dir));
+  std::string display_name = selected_path;
+
+  if (selected_path != "all") {
+    if (selected_path == "user") {
+      path /= "user";
+      display_name = "User Templates";
+    } else if (selected_path == "center") {
+      path /= "community-templates";
+      display_name = "Community Templates";
+    } else if (selected_path == "remote") {
+      path /= "remote";
+      display_name = "Remote Templates";
+    } else if (selected_path == "system") {
+      path /= "system";
+      display_name = "System Templates";
+    } else {
+      path /= dir;
+      display_name = dir + " Templates";
+    }
+  } else {
+    display_name = "All Templates";
+  }
+
+  auto templates = TemplateUtils::ListTemplates(path);
+
+  constexpr int total_width = 50;
+
+  {
+    auto header = loc.getText("LIST_HEADER_TEMPLATES");
+    int dash_count = total_width - 3 - static_cast<int>(header.size());
+    if (dash_count < 0)
+      dash_count = 0;
+
+    std::string dashes;
+    dashes.reserve(dash_count * 3);
+    for (int i = 0; i < dash_count; i++)
+      dashes += u8"─";
+
+    std::cout << Colors::BOLD << Colors::CYAN << "┌─ " << header << " "
+              << dashes << Colors::RESET << std::endl;
+  }
+
+  {
+    std::cout << Colors::BOLD << Colors::CYAN << "│ " << Colors::RESET
+              << Colors::YELLOW << display_name << Colors::RESET << std::endl;
+  }
+
+  {
+    auto count_text = std::to_string(templates.size()) + " " +
+                      loc.getText("LIST_TEMPLATE_COUNT");
+    std::cout << Colors::BOLD << Colors::CYAN << "│ " << Colors::RESET
+              << count_text << std::endl;
+  }
+
+  {
+    std::string bottom;
+    bottom.reserve((total_width - 1) * 3);
+    for (int i = 0; i < total_width - 1; i++)
+      bottom += u8"─";
+
+    std::cout << Colors::BOLD << Colors::CYAN << "└" << bottom << Colors::RESET
+              << std::endl;
+  }
+
+  if (templates.empty()) {
+    std::cout << "  " << Colors::YELLOW << loc.getText("LIST_NO_TEMPLATES")
+              << " " << display_name << Colors::RESET << std::endl;
+    return 0;
+  }
+
+  for (const auto &t : templates) {
+    std::cout << std::endl;
+
+    auto metadata = TemplateUtils::GetTemplateMetadata(t.first);
+
+    if (metadata) {
+      std::cout << Colors::BOLD << Colors::GREEN << "  " << metadata->name;
+      if (!metadata->version.empty()) {
+        std::cout << Colors::MAGENTA << " v" << metadata->version;
+      }
+      std::cout << Colors::RESET << std::endl;
+
+      if (!metadata->description.empty()) {
+        std::cout << Colors::WHITE << "    " << metadata->description
+                  << Colors::RESET << std::endl;
+      }
+
+      std::cout << Colors::CYAN << "    " << loc.getText("LIST_TEMPLATE_AUTHOR")
+                << ": " << Colors::RESET;
+      if (!metadata->author.empty()) {
+        std::cout << metadata->author;
+      } else {
+        std::cout << Colors::YELLOW << loc.getText("LIST_UNKNOWN_AUTHOR")
+                  << Colors::RESET;
+      }
+      std::cout << std::endl;
+
+    } else {
+      std::cout << Colors::BOLD << Colors::GREEN << "  " << t.second
+                << Colors::RESET << std::endl;
+    }
+
+    std::cout << Colors::BLUE << "    " << loc.getText("LIST_TEMPLATE_PATH")
+              << ": " << Colors::RESET << t.first.string() << std::endl;
+  }
+
+  std::cout << std::endl;
+  return 0;
+}
+
+int handleFind(const std::string &name, Localita &loc) { return 0; }
+
 // ---------------- Main ----------------
 
 int main(int argc, char **argv) {
@@ -358,6 +474,9 @@ int main(int argc, char **argv) {
   cli.addOption("p", "pull", Cliopatra::Option::multi_string_o);
   cli.addOption("r", "remote", Cliopatra::Option::string_o);
   cli.addOption("e", "extract", Cliopatra::Option::string_o);
+  cli.addOption("l", "list", Cliopatra::Option::bool_o);
+  cli.addOption("n", "name", Cliopatra::Option::string_o);
+  cli.addOption("f", "find", Cliopatra::Option::string_o);
 
   Localita loc;
   loc.setLocalePath(
@@ -377,6 +496,23 @@ int main(int argc, char **argv) {
 
   try {
     auto results = cli.parse(argc, argv);
+
+    if (results.find("find") != results.end()) {
+      if (results.find("name") != results.end()) {
+        std::cerr << loc.getText("NAME_NOT_ENTERED") << std::endl;
+      } else {
+
+      }
+    }
+
+    if (results.find("list") != results.end()) {
+      if (results.find("name") != results.end()) {
+        return handleList(std::get<std::string>(results.at("name")), loc);
+      } else {
+        return handleList("all", loc);
+      }
+    }
+
     if (results.find("extract") != results.end()) {
       return handleExtract(std::get<std::string>(results.at("extract")), loc);
     }
