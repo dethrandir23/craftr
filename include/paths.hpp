@@ -5,6 +5,15 @@
 #include <string>
 
 namespace Paths {
+
+inline std::filesystem::path getSystemDataDir() {
+#if defined(DATA_DIR)
+    return std::filesystem::path(DATA_DIR);
+#else
+    return std::filesystem::path(PROJECT_ROOT_DIR) / "data";
+#endif
+}
+
 inline std::filesystem::path getDataDir(const std::string &app_name) {
   std::filesystem::path data_path;
 
@@ -34,16 +43,17 @@ inline std::filesystem::path getDataDir(const std::string &app_name) {
 #endif
 
   if (data_path.empty()) {
-    data_path = std::filesystem::current_path() / app_name / "data";
+    data_path = std::filesystem::current_path() / app_name;
   }
 
   try {
     std::filesystem::create_directories(data_path);
   } catch (const std::filesystem::filesystem_error &e) {
-    std::cerr << "Failed to create data directory: " << e.what() << std::endl;
+    std::cerr << "Failed to create user data directory: " << e.what() << std::endl;
     return std::filesystem::path();
   }
 
   return data_path;
 }
+
 } // namespace Paths

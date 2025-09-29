@@ -239,7 +239,33 @@ std::filesystem::path getDataDir(const std::string &app_name) {
 }
 
 std::filesystem::path get_templates_folder() {
-  return getDataDir(StringUtils::toLower(Metadata::name())).append("templates");
+    std::string app_name = StringUtils::toLower(Metadata::name());
+    auto user_dir = Paths::getDataDir(app_name) / "templates";
+    auto system_dir = Paths::getSystemDataDir() / "templates";
+    
+    if (!std::filesystem::exists(user_dir)) {
+        if (std::filesystem::exists(system_dir)) {
+            try {
+                std::filesystem::create_directories(user_dir);
+                for (const auto& entry : std::filesystem::recursive_directory_iterator(system_dir)) {
+                    if (entry.is_regular_file()) {
+                        auto relative_path = std::filesystem::relative(entry.path(), system_dir);
+                        auto target_path = user_dir / relative_path;
+                        std::filesystem::create_directories(target_path.parent_path());
+                        std::filesystem::copy_file(entry.path(), target_path, 
+                                                 std::filesystem::copy_options::overwrite_existing);
+                    }
+                }
+            } catch (const std::filesystem::filesystem_error& e) {
+                std::cerr << "Failed to copy templates: " << e.what() << std::endl;
+                return system_dir; // Fallback to system directory
+            }
+        } else {
+            return user_dir;
+        }
+    }
+    
+    return user_dir;
 }
 
 } // namespace FileUtils
