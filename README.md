@@ -9,11 +9,6 @@
 
 # Craftr 🛠️
 
-[](https://opensource.org/licenses/MIT)
-[](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
-[](https://cmake.org/)
-[](https://github.com/dethrandir23/craftr)
-
 **Craftr** is a powerful, template-driven command-line tool that eliminates the hassle of starting projects from scratch. Tired of manually creating directories, copying boilerplate, setting up build systems, and adding license files every time you start a new project? Craftr is a flexible scaffolding engine that automates this entire process for you.
 
 While it was born as a C++ project creator, its **YAML-based template engine** now allows you to create instant starter templates for **any language or project structure**.
