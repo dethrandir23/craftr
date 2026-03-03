@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craftr | Project Scaffolding Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(90deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .code-card {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-300 antialiased">
+
+    <nav class="fixed w-full z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">🛠️</span>
+                <span class="text-xl font-bold text-white tracking-tight">Craftr</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="#features" class="hover:text-blue-400 transition">Özellikler</a>
+                <a href="#install" class="hover:text-blue-400 transition">Kurulum</a>
+                <a href="https://github.com/dethrandir23/craftr" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">GitHub'da Gör</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="flex justify-center space-x-2 mb-6 flex-wrap gap-y-2">
+                <img src="https://img.shields.io/badge/License-GPL-yellow.svg" alt="GPL">
+                <img src="https://img.shields.io/badge/C%2B%2B-17-blue.svg" alt="C++17">
+                <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-blue.svg" alt="Platform">
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+                Projelerini <span class="gradient-text">Işık Hızında</span> Başlat
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 mb-10 leading-relaxed">
+                Craftr, tekrarlayan kurulum işlerini ortadan kaldıran, YAML tabanlı, esnek bir proje iskeleti (scaffolding) oluşturma aracıdır.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+                <code class="bg-slate-800 text-blue-300 px-6 py-3 rounded-xl border border-slate-700 mono text-sm md:text-base">
+                    git clone https://github.com/dethrandir23/craftr.git
+                </code>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="py-20 bg-[#111a2e]">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-white mb-12 text-center">Neden Craftr?</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-blue-500 transition group">
+                    <div class="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 group-hover:text-white transition">
+                        <i class="fas fa-file-code text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">YAML ile Güçlendirildi</h3>
+                    <p class="text-slate-400 leading-relaxed">Karmaşık konfigürasyonlar yerine okunabilir YAML dosyalarıyla projeni tanımla.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-blue-500 transition group">
+                    <div class="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center mb-6 group-hover:bg-emerald-500 group-hover:text-white transition">
+                        <i class="fas fa-globe text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">15+ Dil Desteği</h3>
+                    <p class="text-slate-400 leading-relaxed">Türkçe'den Japonca'ya kadar geniş dil desteği ile CLI deneyimini kişiselleştir.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-slate-800/50 border border-slate-700 hover:border-blue-500 transition group">
+                    <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-lg flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition">
+                        <i class="fas fa-bolt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Post-Creation Hooks</h3>
+                    <p class="text-slate-400 leading-relaxed">Proje oluştuktan sonra otomatik olarak 'git init' veya 'npm install' komutlarını çalıştır.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-6">Basit ve Güçlü Şablonlar</h2>
+                    <p class="text-slate-400 mb-6 leading-relaxed">
+                        Kendi template'ini oluşturmak çok kolay. Değişkenleri tanımla, klasör yapısını belirle ve Craftr gerisini halletsin.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check-circle text-emerald-500 mr-3"></i> İnteraktif değişken sorgulama
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check-circle text-emerald-500 mr-3"></i> Uzak (Remote) template çekme
+                        </li>
+                        <li class="flex items-center text-slate-300">
+                            <i class="fas fa-check-circle text-emerald-500 mr-3"></i> Var olan projeyi template'e dönüştürme
+                        </li>
+                    </ul>
+                </div>
+                <div class="code-card rounded-xl overflow-hidden text-sm mono">
+                    <div class="bg-[#2d2d2d] px-4 py-2 text-xs text-slate-400 flex justify-between">
+                        <span>template.yaml</span>
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre class="text-blue-300"><span class="text-pink-400">name:</span> "cpp-pro"</pre>
+                        <pre class="text-blue-300"><span class="text-pink-400">variables:</span></pre>
+                        <pre class="text-blue-300">  <span class="text-pink-400">PROJECT_NAME:</span> "{{PROJECT_NAME}}"</pre>
+                        <pre class="text-blue-300"><span class="text-pink-400">subfolders:</span></pre>
+                        <pre class="text-blue-300">  - include</pre>
+                        <pre class="text-blue-300">  - src</pre>
+                        <pre class="text-blue-300"><span class="text-pink-400">commands:</span></pre>
+                        <pre class="text-blue-300">  - <span class="text-pink-400">command:</span> "git init"</pre>
+                        <pre class="text-blue-300">    <span class="text-pink-400">description:</span> "Repo hazırlanıyor..."</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 border-t border-slate-800 text-center">
+        <div class="max-w-6xl mx-auto px-6">
+            <p class="text-slate-500 text-sm mb-4">
+                Craftr is made with ❤️ by <a href="https://github.com/dethrandir23" class="text-blue-400 hover:underline">dethrandir23</a>.
+            </p>
+            <div class="flex justify-center space-x-6 text-slate-400">
+                <a href="https://github.com/dethrandir23/craftr" class="hover:text-white transition"><i class="fab fa-github text-xl"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fab fa-twitter text-xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
