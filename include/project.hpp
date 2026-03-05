@@ -8,6 +8,7 @@
 #include "replacer.hpp"
 #include <filesystem>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Project {
@@ -26,6 +27,8 @@ private:
   CommandUtils::CommandMode commandMode;
   bool silent_mode;
   std::vector<std::pair<std::string, std::string>> commands;
+
+  std::vector<std::pair<std::string, std::string>> build_commands;
 
   std::filesystem::path projectSubFolder;
   ProjectTemplate tmpl;
@@ -91,4 +94,8 @@ public:
 
   void createCommands();
   void createContentFiles();
+
+  std::vector<std::pair<std::string, std::string>> getBuildCommands() const {
+    return this->build_commands;
+  }
 };

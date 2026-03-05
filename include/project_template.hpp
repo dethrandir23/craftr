@@ -128,6 +128,9 @@ private:
 
   std::vector<std::pair<std::string, std::string>> commands;
   CommandUtils::CommandMode commandMode;
+
+  std::vector<std::pair<std::string, std::string>> build_commands;
+
   bool silent_mode;
 
   std::map<std::string, std::string> licenses;
