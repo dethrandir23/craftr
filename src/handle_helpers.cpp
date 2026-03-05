@@ -599,4 +599,39 @@ int handleFind(const std::string &name, Localita &loc) {
 
   return handleCreateWithPath(selected_template, loc);
 }
+
+int handleBuild(Localita &loc) {
+    std::filesystem::path buildFile = std::filesystem::current_path() / ".craftr" / "build.yaml";
+
+    if (!std::filesystem::exists(buildFile)) {
+        std::cerr << "[" << loc.getText("ERROR") << "] " << "build.yaml not found!" << std::endl;
+        return 1;
+    }
+
+    try {
+        YAML::Node buildConfig = YAML::LoadFile(buildFile.string());
+        std::vector<std::pair<std::string, std::string>> commands;
+
+        for (const auto& step : buildConfig) {
+            commands.push_back({
+                step["command"].as<std::string>(),
+                step["description"].as<std::string>()
+            });
+        }
+
+        bool success = CommandUtils::run_commands_with_description(
+            commands, 
+            CommandUtils::CommandMode::Cautious,
+            false,
+            loc
+        );
+
+        return success ? 0 : 1;
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+}
+
 } // namespace HandleHelpers

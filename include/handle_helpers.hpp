@@ -45,4 +45,7 @@ int handleCreateWithPath(const std::filesystem::path &templatePath,
                          Localita &loc);
 
 int handleFind(const std::string &name, Localita &loc);
+
+int handleBuild(Localita &loc);
+
 } // namespace HandleHelpers

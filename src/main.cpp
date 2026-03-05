@@ -43,8 +43,6 @@
 #include <string>
 #include <vector>
 
-
-
 // ---------------- Main ----------------
 
 int main(int argc, char **argv) {
@@ -53,7 +51,7 @@ int main(int argc, char **argv) {
   cli.addOption("v", "version", Cliopatra::Option::bool_o);
   cli.addOption("c", "create", Cliopatra::Option::bool_o);
   cli.addOption("a", "add", Cliopatra::Option::string_o);
-  cli.addOption("b", "build", Cliopatra::Option::string_o);
+  cli.addOption("b", "build", Cliopatra::Option::bool_o);
   cli.addOption("co", "config", Cliopatra::Option::string_o);
   cli.addOption("va", "validate", Cliopatra::Option::bool_o);
   cli.addOption("t", "template", Cliopatra::Option::string_o);
@@ -155,6 +153,15 @@ int main(int argc, char **argv) {
         return 1;
       return HandleHelpers::handleCreate(template_directories,
                           std::get<std::string>(results.at("template")), loc);
+    }
+
+    if (results.find("add") != results.end()) {
+      std::cout << "Not implemented yet" << std::endl;
+      return 1;
+    }
+
+    if (results.find("build") != results.end()) {
+      return HandleHelpers::handleBuild(loc);
     }
 
     std::cerr << "[" << loc.getText("ERROR") << "] "
