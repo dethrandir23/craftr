@@ -160,9 +160,20 @@ int main(int argc, char **argv) {
       return 1;
     }
 
-    if (results.find("build") != results.end()) {
-      return HandleHelpers::handleBuild(loc);
-    }
+  if (results.find("build") != results.end()) {
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    int exitCode = HandleHelpers::handleBuild(loc);
+    
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    
+    std::cout << Colors::CYAN << "[" << loc.getText("INFO") << "] "
+              << Colors::RESET << loc.getText("BUILD_FINISHED_IN") << " "
+              << elapsed_seconds.count() << "s" << std::endl;
+
+    return exitCode;
+  }
 
     std::cerr << "[" << loc.getText("ERROR") << "] "
               << loc.getText("NO_COMMAND_PROVIDED_ERROR") << std::endl;
