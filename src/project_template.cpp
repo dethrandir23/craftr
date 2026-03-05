@@ -117,6 +117,22 @@ bool ProjectTemplate::LoadTemplate() {
       }
     }
 
+    // build
+    if (config["build_commands"]) {
+      for (auto it : config["build_commands"]) {
+        if (it["command"]) {
+          if (it["description"]) {
+            build_commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(),
+                               it["description"].as<std::string>()));
+          } else {
+            build_commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(), ""));
+          }
+        }
+      }
+    }
+
     return true;
 
   } catch (const std::exception &e) {

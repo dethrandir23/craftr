@@ -3,6 +3,13 @@
 #include <exception>
 #include <iostream>
 #include <string>
+#include <filesystem>
+#include <yaml-cpp/emitter.h>
+#include <yaml-cpp/node/emit.h>
+#include <yaml-cpp/node/node.h>
+#include <fstream>
+#include <ostream>
+#include <istream>
 
 #include "../include/command_utils.hpp"
 #include "../include/config.hpp"
@@ -11,8 +18,42 @@
 #include "../include/project_template.hpp"
 #include "../include/replacer_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
+#include "../include/replacer_utils.hpp"
 
 namespace ProjectUtils {
+
+  bool saveBuildCommands(const Project &project) {
+    try {
+        std::filesystem::path craftrDir = project.getProjectSubFolder() / ".craftr";
+        
+        // .craftr klasörü yoksa oluştur
+        if (!std::filesystem::exists(craftrDir)) {
+            std::filesystem::create_directories(craftrDir);
+        }
+
+        YAML::Node buildNode;
+        auto buildCmds = project.getBuildCommands();
+
+        for (const auto& bc : buildCmds) {
+            YAML::Node item;
+            item["command"] = ReplacerUtils::FillReplacersFromArgs(bc.command, project.getReplacers());
+            item["description"] = ReplacerUtils::FillReplacersFromArgs(bc.description, project.getReplacers());
+            buildNode.push_back(item);
+        }
+
+
+        std::filesystem::path fname = "build.yaml";
+        auto fpath = craftrDir / fname;
+
+        std::ofstream fout(fpath, std::ios::trunc);
+        fout << YAML::Dump(buildNode);
+
+        return true;
+    } catch (const std::exception &e) {
+        std::cerr << "Build commands saving failed: " << e.what() << std::endl;
+        return false;
+    }
+}
 
 bool create_project(const Config &config, Localita &loc) {
   try {
@@ -30,6 +71,10 @@ bool create_project(const Config &config, Localita &loc) {
     if (!FileUtils::write_project(project)) {
       std::cerr << loc.getText("SOMETHING_WENT_WRONG") << std::endl;
       return false;
+    }
+
+    if (!saveBuildCommands(project)) {
+        std::cerr << "Warning: Could not save build metadata." << std::endl;
     }
 
     project.createCommands();
