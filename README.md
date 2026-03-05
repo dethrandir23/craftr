@@ -22,6 +22,8 @@ While it was born as a C++ project creator, its **YAML-based template engine** n
 - **✅ Template Validation:** Ensure template quality with `--validate`
 - **🌍 Multi-language UI:** **Multi-language UI:** 15 languages supported - English, Turkish, Spanish, French, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean, Arabic, Hindi, Dutch, Polish
 - **⚡ Post-Creation Hooks:** Automate setup commands (git init, npm install, etc.)
+- **🔨 Smart Build System:** Generate and execute project-specific build commands with a single flag
+- **⏱️ Build Timing:** Track exactly how long your build process takes
 - **📦 Cross-Platform:** Works on Linux, macOS, and Windows
 - **🎨 Colorful CLI:** Beautiful, color-coded output for better UX
 
@@ -185,6 +187,11 @@ commands:
     description: "Staging files for first commit..."
   - command: "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
     description: "Creating first commit..."
+
+# Build commands are saved to .craftr/build.yaml in the project folder
+build_commands:
+  - command: "cd {{PROJECT_NAME}} && mkdir build && cd build && cmake .. && make"
+    description: "Building {{PROJECT_NAME}}..."
 ```
 
 ## 🎯 Command Reference
@@ -226,7 +233,7 @@ bash
 | Command | Description |
 |---------|-------------|
 | `-a, --add <module>` | Add module/component to project |
-| `-b, --build <target>` | Build project (template-dependent) |
+| `-b, --build` | Execute build commands defined in `.craftr/build.yaml`
 | `-co, --config <key=value>` | Set configuration options |
 
 ### Examples
@@ -284,6 +291,17 @@ craftr --language system
 
 ### Show version
 craftr --version
+
+## 🔨 Building Your Project
+
+Once a project is created, Craftr saves the build instructions in `.craftr/build.yaml` within your project directory. You can execute these commands anytime without remembering complex flags:
+
+```bash
+craftr --build
+>> Building Mordor...
+[OK] cd Mordor && mkdir build && cd build && cmake .. && make
+[INFO] Build finished in 4.25s
+```
 
 ## 🤝 Contributing
 
