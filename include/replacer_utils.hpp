@@ -6,8 +6,10 @@
 
 namespace ReplacerUtils {
 
+std::string ProcessString(const std::string &text, const std::vector<Replacer> &replacers);
+
 void FillReplacersFromConfig(std::vector<Replacer> &replacers,
                              const Config &config);
 
-void FillReplacersFromArgs(std::vector<Replacer> &replacers);
+void FillFromMap(std::vector<Replacer> &replacers, const std::map<std::string, std::string> &vars);
 } // namespace ReplacerUtils
