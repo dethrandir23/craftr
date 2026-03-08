@@ -136,6 +136,47 @@ bool ValidateTemplate(const YAML::Node &tmpl, std::vector<std::string> &errors,
     }
   }
 
+  // --- build_commands (must be sequence of maps with scalar "command") ---
+  YAML::Node build_commands = tmpl["build_commands"];
+  if (build_commands) {
+    if (!build_commands.IsSequence()) {
+      errors.push_back(loc.getText("BUILD_COMMANDS_MUST_BE_SEQUENCE"));
+    } else {
+      for (std::size_t i = 0; i < build_commands.size(); ++i) {
+        YAML::Node cmd_item = build_commands[i];
+        if (!cmd_item.IsMap()) {
+          errors.push_back(loc.getText("BUILD_COMMANDS_ITEM_MUST_BE_MAP"));
+          continue;
+        }
+        if (!cmd_item["command"] || !cmd_item["command"].IsScalar()) {
+          errors.push_back(loc.getText("BUILD_COMMANDS_ITEM_MISSING_COMMAND") +
+                           std::to_string(i));
+        }
+      }
+    }
+  }
+
+  // --- run_commands (must be sequence of maps with scalar "command") ---
+  YAML::Node run_commands = tmpl["run_commands"];
+  if (run_commands) {
+    if (!run_commands.IsSequence()) {
+      errors.push_back(loc.getText("RUN_COMMANDS_MUST_BE_SEQUENCE"));
+    } else {
+      for (std::size_t i = 0; i < run_commands.size(); ++i) {
+        YAML::Node cmd_item = run_commands[i];
+        if (!cmd_item.IsMap()) {
+          errors.push_back(loc.getText("RUN_COMMANDS_ITEM_MUST_BE_MAP"));
+          continue;
+        }
+        if (!cmd_item["command"] || !cmd_item["command"].IsScalar()) {
+          errors.push_back(loc.getText("RUN_COMMANDS_ITEM_MISSING_COMMAND") +
+                           std::to_string(i));
+        }
+      }
+    }
+  }
+  
+
   return errors.empty();
 }
 
