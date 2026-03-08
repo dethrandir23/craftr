@@ -88,4 +88,40 @@ inline bool run_commands_with_description(
 
   return all_ok;
 }
+
+inline bool run_commands_independently(
+    const std::vector<std::pair<std::string, std::string>> &commands,
+    Localita &loc) {
+    
+    bool all_ok = true;
+
+    for (const auto &cmd_pair : commands) {
+        const std::string& cmd = cmd_pair.first;
+        const std::string& description = cmd_pair.second;
+
+        if (!description.empty()) {
+            std::cout << Colors::MAGENTA << description << Colors::RESET << std::endl;
+        }
+
+        std::cout << Colors::CYAN << "┌" << std::string(50, '-') << Colors::RESET << std::endl;
+        std::cout << std::endl;
+
+        int ret = system(cmd.c_str());
+
+        std::cout << std::endl;
+        std::cout << Colors::CYAN << "└" << std::string(50, '-') << Colors::RESET << std::endl;
+
+        if (ret != 0) {
+            std::cerr << Colors::RED << "[" << loc.getText("FAIL") << "] " 
+                      << Colors::RESET << cmd << " (Code: " << ret << ")" << std::endl;
+            all_ok = false;
+            return false;
+        }
+        
+        std::cout << std::endl; 
+    }
+
+    return all_ok;
+}
+
 } // namespace CommandUtils
