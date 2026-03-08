@@ -15,7 +15,10 @@ file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 add_executable(craftr ${SOURCES})
 
 # Include directories
-target_include_directories(craftr PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(craftr PRIVATE 
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/libs
+)
 set_target_properties(craftr PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 
 add_compile_definitions(PROJECT_ROOT_DIR="${CMAKE_SOURCE_DIR}")
