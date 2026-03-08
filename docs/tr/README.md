@@ -312,7 +312,7 @@ Bu proje **GPL Lisansı** ile lisanslanmıştır. Ayrıntılar için [LICENSE](.
 
 ## 🙏 Teşekkürler
 
-* `cargo new` ve `cookiecutter` gibi harika araçlardan ilham alındı.
+* `cargo` ve `cookiecutter` gibi harika araçlardan ilham alındı.
 * Komut satırı ayrıştırma için [Cliopatra](https://github.com/dethrandir23/Cliopatra) kullanıldı.
 * Şablon sistemi için [yaml-cpp](https://github.com/jbeder/yaml-cpp) kullanıldı.
 * Craftr’ı geliştirmeye katkıda bulunan herkese teşekkürler!

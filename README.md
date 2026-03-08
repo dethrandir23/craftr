@@ -319,7 +319,7 @@ This project is licensed under the **GPL License**. See the [LICENSE](LICENSE) f
 
 ## 🙏 Acknowledgments
 
-  - Inspired by great tools like `cargo new` and `cookiecutter`.
+  - Inspired by great tools like `cargo` and `cookiecutter`.
   - Built with [Cliopatra](https://github.com/dethrandir23/Cliopatra) for command-line parsing.
   - Used [yaml-cpp](https://github.com/jbeder/yaml-cpp) for templating system
   - Thanks to all contributors who help improve Craftr\!
