@@ -115,6 +115,13 @@ public:
   bool getSilentMode() const { return this->silent_mode; }
   void setSilentMode(bool sm) { this->silent_mode = sm; }
 
+  std::vector<std::pair<std::string, std::string>> getBuildCommands() const {
+    return this->build_commands;
+  }
+  std::vector<std::pair<std::string, std::string>> getRunCommands() const {
+    return this->run_commands;
+  }
+
 private:
   std::string name = "";
   std::string version = "";
@@ -130,6 +137,7 @@ private:
   CommandUtils::CommandMode commandMode;
 
   std::vector<std::pair<std::string, std::string>> build_commands;
+  std::vector<std::pair<std::string, std::string>> run_commands;
 
   bool silent_mode;
 

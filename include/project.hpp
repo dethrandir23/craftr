@@ -29,6 +29,7 @@ private:
   std::vector<std::pair<std::string, std::string>> commands;
 
   std::vector<std::pair<std::string, std::string>> build_commands;
+  std::vector<std::pair<std::string, std::string>> run_commands;
 
   std::filesystem::path projectSubFolder;
   ProjectTemplate tmpl;
@@ -39,6 +40,8 @@ public:
     replacers = t.GetReplacers();
     subFolders = t.GetSubFolders();
     commands = t.getCommands();
+    build_commands = t.getBuildCommands();
+    run_commands = t.getRunCommands();
     commandMode = t.getCommandMode();
     silent_mode = t.getSilentMode();
   }
@@ -97,5 +100,9 @@ public:
 
   std::vector<std::pair<std::string, std::string>> getBuildCommands() const {
     return this->build_commands;
+  }
+
+  std::vector<std::pair<std::string, std::string>> getRunCommands() const {
+    return this->run_commands;
   }
 };

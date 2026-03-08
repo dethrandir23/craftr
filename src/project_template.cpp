@@ -133,6 +133,22 @@ bool ProjectTemplate::LoadTemplate() {
       }
     }
 
+    // run
+    if (config["run_commands"]) {
+      for (auto it : config["run_commands"]) {
+        if (it["command"]) {
+          if (it["description"]) {
+            run_commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(),
+                               it["description"].as<std::string>()));
+          } else {
+            run_commands.emplace_back(
+                std::make_pair(it["command"].as<std::string>(), ""));
+          }
+        }
+      }
+    }
+
     return true;
 
   } catch (const std::exception &e) {
