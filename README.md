@@ -335,3 +335,7 @@ This project is licensed under the **GPL License**. See the [LICENSE](LICENSE) f
   - [Türkçe](docs/tr/README.md)
 
 **Craftr** is made with ❤️ by [dethrandir23](https://github.com/dethrandir23).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=dethrandir23/craftr&type=date&legend=top-left)](https://www.star-history.com/?repos=dethrandir23%2Fcraftr&type=date&legend=top-left)
