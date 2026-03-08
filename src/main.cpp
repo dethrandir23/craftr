@@ -182,6 +182,8 @@ int main(int argc, char **argv) {
 
     std::cerr << "[" << loc.getText("ERROR") << "] "
               << loc.getText("NO_COMMAND_PROVIDED_ERROR") << std::endl;
+
+    OutputUtils::print_help(loc);
     return 1;
 
   } catch (const std::exception &e) {
