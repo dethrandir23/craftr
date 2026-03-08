@@ -62,20 +62,6 @@ if(UNIX AND NOT APPLE)
         PATTERN "libs" EXCLUDE
         PATTERN ".git" EXCLUDE
     )
-
-    if(NOT DEFINED USER_HOME)
-        set(USER_HOME $ENV{HOME})
-    endif()
-    set(USER_DATA_DIR "${USER_HOME}/.local/share/craftr")
-    message(STATUS "Installing data files to user directory: ${USER_DATA_DIR}")
-
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/
-        DESTINATION ${USER_DATA_DIR}
-        USE_SOURCE_PERMISSIONS
-        PATTERN "libs" EXCLUDE
-        PATTERN ".git" EXCLUDE
-    )
-
 elseif(APPLE)
     install(DIRECTORY data/
         DESTINATION Resources
@@ -92,8 +78,10 @@ endif()
 
 # ================= CPACK =================
 set(CPACK_PACKAGE_NAME "craftr")
-set(CPACK_PACKAGE_VENDOR "Bekir Efe Öztürk <efeoztrk23@proton.me>")
+set(CPACK_PACKAGE_VENDOR "Bekir Efe Öztürk")
+set(CPACK_PACKAGE_CONTACT "efeozturk@pm.me")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A project template generator")
+set(CPACK_PACKAGE_DESCRIPTION "Craftr is an advanced project template generator for C++ and other languages, designed to streamline your workflow and project initialization.")
 set(CPACK_PACKAGE_VERSION "1.1.0")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
@@ -111,7 +99,9 @@ elseif(APPLE)
     set(CPACK_DMG_VOLUME_NAME "Craftr")
 else()
     set(CPACK_GENERATOR "DEB;RPM;ZIP")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bekir Efe Öztürk <efeoztrk23@proton.me>")
+    set(CPACK_RPM_PACKAGE_LICENSE "AGPL-3.0")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Bekir Efe Öztürk <efeozturk@pm.me>")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/dethrandir23/craftr")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.28), libstdc++6 (>= 9)")
 endif()
 
