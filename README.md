@@ -192,6 +192,10 @@ commands:
 build_commands:
   - command: "cd {{PROJECT_NAME}} && mkdir build && cd build && cmake .. && make"
     description: "Building {{PROJECT_NAME}}..."
+
+run_commands:
+  - command: "./build/{{PROJECT_NAME}}"
+    description: "Running {{PROJECT_NAME}}..."
 ```
 
 ## 🎯 Command Reference

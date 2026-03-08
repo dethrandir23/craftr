@@ -189,6 +189,14 @@ commands:
     description: "İlk commit için dosyalar hazırlanıyor..."
   - command: "cd {{PROJECT_NAME}} && git commit -m 'Initial commit'"
     description: "İlk commit oluşturuluyor..."
+
+build_commands:
+  - command: "cd {{PROJECT_NAME}} && mkdir build && cd build && cmake .. && make"
+    description: "Building {{PROJECT_NAME}}..."
+
+run_commands:
+  - command: "./build/{{PROJECT_NAME}}"
+    description: "Running {{PROJECT_NAME}}..."
 ```
 
 ## 🎯 Komut Referansı
