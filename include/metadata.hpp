@@ -2,7 +2,7 @@
 
 #include "paths.hpp"
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 #include <stdexcept>
 #include <string>
 #if defined(_WIN32)
