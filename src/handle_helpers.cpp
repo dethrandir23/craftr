@@ -15,6 +15,7 @@
 #include "../include/template_utils.hpp"
 #include "../include/validate_utils.hpp"
 #include "../libs/localita/include/Localita.hpp"
+#include <yaml-cpp/yaml.h>
 #include <exception>
 #include <filesystem>
 #include <iostream>
@@ -615,7 +616,7 @@ int handleBuild(Localita &loc) {
         for (const auto& step : buildConfig) {
             commands.push_back({
                 step["command"].as<std::string>(),
-                step["description"].as<std::string>()
+                step["description"] ? step["description"].as<std::string>() : "No description"
             });
         }
 
@@ -634,4 +635,78 @@ int handleBuild(Localita &loc) {
     }
 }
 
+int handleRun(Localita &loc) {
+    std::string projectName = "unknown";
+    
+    std::filesystem::path metadataFile = std::filesystem::current_path() / "metadata" / "metadata.json";
+    if (std::filesystem::exists(metadataFile)) {
+
+    std::ifstream file(metadataFile);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    nlohmann::json j = nlohmann::json::parse(buffer.str());
+      projectName = j["name"];
+    
+    }
+
+    std::filesystem::path executablePath = std::filesystem::current_path() / "build" / projectName; 
+    std::filesystem::path srcPath = std::filesystem::current_path() / "src";
+
+    bool needsBuild = true;
+
+    if (std::filesystem::exists(executablePath)) {
+        auto binaryTime = std::filesystem::last_write_time(executablePath);
+        bool sourceChanged = false;
+
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(srcPath)) {
+            if (std::filesystem::last_write_time(entry.path()) > binaryTime) {
+                sourceChanged = true;
+                break;
+            }
+        }
+
+        if (!sourceChanged) {
+            needsBuild = false;
+            //std::cout << Colors::GREEN << "[INFO] Binary is up to date. Skipping build..." << Colors::RESET << std::endl;
+        }
+    }
+
+    if (needsBuild) {
+        std::filesystem::path buildFile = std::filesystem::current_path() / ".craftr" / "build.yaml";
+        if (std::filesystem::exists(buildFile)) {
+            if (handleBuild(loc) != 0) return 1;
+        }
+    }
+
+    std::filesystem::path runFile = std::filesystem::current_path() / ".craftr" / "run.yaml";
+    if (!std::filesystem::exists(runFile)) return 1;
+
+    try {
+        YAML::Node runConfig = YAML::LoadFile(runFile.string());
+        std::vector<std::pair<std::string, std::string>> commands;
+
+        if (runConfig.IsSequence()) {
+            for (const auto& step : runConfig) {
+                commands.push_back({
+                    step["command"].as<std::string>(),
+                    step["description"] ? step["description"].as<std::string>() : "Running..."
+                });
+            }
+        } else if (runConfig["run_commands"]) {
+            for (const auto& step : runConfig["run_commands"]) {
+                commands.push_back({
+                    step["command"].as<std::string>(),
+                    step["description"] ? step["description"].as<std::string>() : "Running..."
+                });
+            }
+        }
+
+      return CommandUtils::run_commands_independently(commands, loc) ? 0 : 1;
+
+    } catch (const std::exception &e) {
+        std::cerr << Colors::RED << "Run error: " << e.what() << Colors::RESET << std::endl;
+        return 1;
+    }
+}
 } // namespace HandleHelpers

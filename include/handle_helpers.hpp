@@ -48,4 +48,6 @@ int handleFind(const std::string &name, Localita &loc);
 
 int handleBuild(Localita &loc);
 
+int handleRun(Localita &loc);
+
 } // namespace HandleHelpers

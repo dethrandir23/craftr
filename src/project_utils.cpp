@@ -4,9 +4,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-#include <yaml-cpp/emitter.h>
-#include <yaml-cpp/node/emit.h>
-#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <ostream>
 #include <istream>
@@ -22,11 +20,10 @@
 
 namespace ProjectUtils {
 
-  bool saveBuildCommands(const Project &project) {
+  bool saveBuildCommands(Project &project) {
     try {
         std::filesystem::path craftrDir = project.getProjectSubFolder() / ".craftr";
         
-        // .craftr klasörü yoksa oluştur
         if (!std::filesystem::exists(craftrDir)) {
             std::filesystem::create_directories(craftrDir);
         }
@@ -36,8 +33,8 @@ namespace ProjectUtils {
 
         for (const auto& bc : buildCmds) {
             YAML::Node item;
-            item["command"] = ReplacerUtils::FillReplacersFromArgs(bc.command, project.getReplacers());
-            item["description"] = ReplacerUtils::FillReplacersFromArgs(bc.description, project.getReplacers());
+            item["command"] = ReplacerUtils::ProcessString(bc.first, project.getReplacers());
+            item["description"] = ReplacerUtils::ProcessString(bc.second, project.getReplacers());
             buildNode.push_back(item);
         }
 
@@ -51,6 +48,38 @@ namespace ProjectUtils {
         return true;
     } catch (const std::exception &e) {
         std::cerr << "Build commands saving failed: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+  bool saveRunCommands(Project &project) {
+    try {
+        std::filesystem::path craftrDir = project.getProjectSubFolder() / ".craftr";
+        
+        if (!std::filesystem::exists(craftrDir)) {
+            std::filesystem::create_directories(craftrDir);
+        }
+
+        YAML::Node runNode;
+        auto runCmds = project.getRunCommands();
+
+        for (const auto& rc : runCmds) {
+            YAML::Node item;
+            item["command"] = ReplacerUtils::ProcessString(rc.first, project.getReplacers());
+            item["description"] = ReplacerUtils::ProcessString(rc.second, project.getReplacers());
+            runNode.push_back(item);
+        }
+
+
+        std::filesystem::path fname = "run.yaml";
+        auto fpath = craftrDir / fname;
+
+        std::ofstream fout(fpath, std::ios::trunc);
+        fout << YAML::Dump(runNode);
+
+        return true;
+    } catch (const std::exception &e) {
+        std::cerr << "Run commands saving failed: " << e.what() << std::endl;
         return false;
     }
 }
@@ -75,6 +104,10 @@ bool create_project(const Config &config, Localita &loc) {
 
     if (!saveBuildCommands(project)) {
         std::cerr << "Warning: Could not save build metadata." << std::endl;
+    }
+
+    if (!saveRunCommands(project)) {
+        std::cerr << "Warning: Could not save run metadata." << std::endl;
     }
 
     project.createCommands();

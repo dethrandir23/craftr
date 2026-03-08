@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
   cli.addOption("c", "create", Cliopatra::Option::bool_o);
   cli.addOption("a", "add", Cliopatra::Option::string_o);
   cli.addOption("b", "build", Cliopatra::Option::bool_o);
+  cli.addOption("ru", "run", Cliopatra::Option::bool_o);
   cli.addOption("co", "config", Cliopatra::Option::string_o);
   cli.addOption("va", "validate", Cliopatra::Option::bool_o);
   cli.addOption("t", "template", Cliopatra::Option::string_o);
@@ -160,20 +161,24 @@ int main(int argc, char **argv) {
       return 1;
     }
 
-  if (results.find("build") != results.end()) {
-    auto start = std::chrono::high_resolution_clock::now();
-    
-    int exitCode = HandleHelpers::handleBuild(loc);
-    
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
-    
-    std::cout << Colors::CYAN << "[" << loc.getText("INFO") << "] "
-              << Colors::RESET << loc.getText("BUILD_FINISHED_IN") << " "
-              << elapsed_seconds.count() << "s" << std::endl;
+    if (results.find("build") != results.end()) {
+      auto start = std::chrono::high_resolution_clock::now();
+      
+      int exitCode = HandleHelpers::handleBuild(loc);
+      
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> elapsed_seconds = end - start;
+      
+      std::cout << Colors::CYAN << "[" << loc.getText("INFO") << "] "
+                << Colors::RESET << loc.getText("BUILD_FINISHED_IN") << " "
+                << elapsed_seconds.count() << "s" << std::endl;
 
-    return exitCode;
-  }
+      return exitCode;
+    }
+
+    if (results.find("run") != results.end()) {
+      return HandleHelpers::handleRun(loc);
+    }
 
     std::cerr << "[" << loc.getText("ERROR") << "] "
               << loc.getText("NO_COMMAND_PROVIDED_ERROR") << std::endl;
