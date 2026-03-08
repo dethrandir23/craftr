@@ -122,6 +122,10 @@ void print_help(Localita &loc) {
             << std::endl;
 
   std::cout << Colors::BOLD << Colors::CYAN << "│   " << Colors::RESET
+            << Colors::BOLD << Colors::GREEN << "-ru, --run" << Colors::RESET
+            << "       " << loc.getText("HELP_DESCRIPTION_RUN") << std::endl;
+
+  std::cout << Colors::BOLD << Colors::CYAN << "│   " << Colors::RESET
             << Colors::BOLD << Colors::GREEN << "-co, --config <key=value>"
             << Colors::RESET << " " << loc.getText("HELP_DESCRIPTION_CONFIG")
             << std::endl;
