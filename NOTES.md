@@ -1,0 +1,1 @@
+Craftr must store template data files in a compressed package format.
